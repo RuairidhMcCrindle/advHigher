@@ -153,6 +153,13 @@ class game():
         self.positionX += self.moveX
         self.positionY += self.moveY
 
+    def run(self):
+        while self.running:
+            self.process()
+            self.update()
+            self.render()
+            self.clockRate.tick(60)
+
 class levelOne(game):
     def __init__(self):
         super().__init__()
@@ -162,12 +169,7 @@ class levelOne(game):
         pygame.draw.rect(self.window, (0,0,0),(self.positionX, self.positionY, 50,50))
         pygame.display.update()
 
-    def run(self):
-        while self.running:
-            self.process()
-            self.update()
-            self.render()
-            self.clockRate.tick(60)
+
 
 
 
