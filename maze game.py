@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.constants import NSEW
 import pygame
-
+from pygame import Vector2 as vector2D
 
 
 
@@ -122,8 +122,7 @@ class game():
         pygame.key.set_repeat(500,25)
         self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
-        self.positionX = 0
-        self.positionY = 0
+        self.position = vector2D(0,0)
         self.moveX = 0
         self.moveY = 0
         self.running = True
@@ -150,8 +149,7 @@ class game():
                 
             
     def update(self):
-        self.positionX += self.moveX
-        self.positionY += self.moveY
+        self.position += vector2D(self.moveX, self.moveY)
 
 class levelOne(game):
     def __init__(self):
@@ -159,7 +157,7 @@ class levelOne(game):
         pygame.display.set_caption("Level One")
     def render(self):
         self.window.fill((0,0,255))
-        pygame.draw.rect(self.window, (0,0,0),(self.positionX, self.positionY, 50,50))
+        pygame.draw.rect(self.window, (0,0,0),(self.position.x, self.position.y, 50,50))
         pygame.display.update()
 
     def run(self):
