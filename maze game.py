@@ -128,6 +128,8 @@ class game():
         self.posMoveY = 0
         self.negMoveX = 0
         self.negMoveY = 0
+        self.totalX = 0
+        self.totalY = 0
         self.running = True
     def process(self):
         self.moveX = 0
@@ -152,11 +154,13 @@ class game():
                 
             
     def update(self):
-        if self.positionX + ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5))) < 0 or self.positionX + ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5))) > 1045 or self.positionY + ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5))) < 0 or self.positionY + ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5))) > 650:
+        self.totalX = ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5)))
+        self.totalY = ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5)))
+        if self.positionX + self.totalX < 0 or self.positionX + self.totalX > 1045 or self.positionY + self.totalY < 0 or self.positionY + self.totalY > 650:
             pass
         else:
-            self.positionX += ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5)))
-            self.positionY += ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5)))
+            self.positionX += self.totalX
+            self.positionY += self.totalY
 
     def run(self):
         while self.running:
