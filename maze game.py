@@ -152,8 +152,8 @@ class game():
                 
             
     def update(self):
-        self.positionX += ((self.posMoveX * 10) + (self.negMoveX * (-10)))
-        self.positionY += ((self.posMoveY * 10) + (self.negMoveY * (-10)))
+        self.positionX += ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5)))
+        self.positionY += ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5)))
 
     def run(self):
         while self.running:
