@@ -60,19 +60,6 @@ class menus():
         self.login.grid(column = 9, row = 16, pady = 2, ipadx = 322)
         self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 305)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
-        #debug code to find size of widgets
-        #self.mainTitle.update()
-        #self.levelSelect.update()
-        #self.leaderboard.update()
-        #self.login.update()
-        #self.signUp.update()
-        #self.quitButton.update()
-        #print(str(self.mainTitle.winfo_width()) + " " + str(self.mainTitle.winfo_height()))
-        #print(str(self.levelSelect.winfo_width()) + " " + str(self.levelSelect.winfo_height()))
-        #print(str(self.leaderboard.winfo_width()) + " " + str(self.leaderboard.winfo_height()))
-        #print(str(self.login.winfo_width()) + " " + str(self.login.winfo_height()))
-        #print(str(self.signUp.winfo_width()) + " " + str(self.signUp.winfo_height()))
-        #print(str(self.quitButton.winfo_width()) + " " + str(self.quitButton.winfo_height()))
 
 
     def setUpSelect(self):
@@ -87,23 +74,7 @@ class menus():
         self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 290)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
-        #debug code to find size of widgets
-        #self.selectTitle.update()
-        #self.selectOne.update()
-        #self.selectTwo.update()
-        #self.selectThree.update()
-        #self.selectFour.update()
-        #self.selectFive.update()
-        #self.mainMenu.update()
-        #self.quitButton.update()
-        #print(str(self.selectOne.winfo_width()) + " " + str(self.selectOne.winfo_height()))
-        #print(str(self.selectTwo.winfo_width()) + " " + str(self.selectTwo.winfo_height()))
-        #print(str(self.selectThree.winfo_width()) + " " + str(self.selectThree.winfo_height()))
-        #print(str(self.selectFour.winfo_width()) + " " + str(self.selectFour.winfo_height()))
-        #print(str(self.selectFive.winfo_width()) + " " + str(self.selectFive.winfo_height()))
-        #print(str(self.selectTitle.winfo_width()) + " " + str(self.selectTitle.winfo_height()))
-        #print(str(self.mainMenu.winfo_width()) + " " + str(self.mainMenu.winfo_height()))
-        #print(str(self.quitButton.winfo_width()) + " " + str(self.quitButton.winfo_height()))
+
 
 
 
@@ -114,12 +85,6 @@ class menus():
         self.leaderboardTitle.grid(column = 9, row = 0)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
-        #self.leaderboardTitle.update()
-        #self.mainMenu.update()
-        #self.quitButton.update()
-        #print(str(self.leaderboardTitle.winfo_width()) + " " + str(self.leaderboardTitle.update()))
-        #print(str(self.mainMenu.winfo_width()) + " " + str(self.mainMenu.winfo_height()))
-        #print(str(self.quitButton.winfo_width()) + " " + str(self.quitButton.winfo_height()))
 
     def setUpLogin(self):
         pass
