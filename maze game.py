@@ -6,7 +6,7 @@ import pygame
 
 
 
-class menus():
+class launcher():
     def __init__(self, window):
         #general widgets
         self.window = window
@@ -96,7 +96,9 @@ class menus():
         pass
 
     def levelOne(self):
-        test()
+        self.firstLevel = levelOne()
+        self.firstLevel.run()
+        pygame.quit()
         
 
     def levelTwo(self):
@@ -114,24 +116,66 @@ class menus():
         
 
 
-
-def test():
-    window = pygame.display.set_mode((640,480))
-    running = True
-    while running:
-        for event in pygame.event.get():
+class game():
+    def __init__(self):
+        pygame.init()
+        pygame.key.set_repeat(500,25)
+        self.window = pygame.display.set_mode((1095, 700))
+        self.clockRate = pygame.time.Clock()
+        self.positionX = 0
+        self.positionY = 0
+        self.moveX = 0
+        self.moveY = 0
+        self.running = True
+    def process(self):
+        self.moveX = 0
+        self.moveY = 0
+        self.eventList = pygame.event.get()
+        for event in self.eventList:
             if event.type == pygame.QUIT:
-                running = False
+                self.running = False   
                 break
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+                    break
+                elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                    self.moveY -= 10
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    self.moveY += 10
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    self.moveX += 10
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    self.moveX -= 10
+                
+            
+    def update(self):
+        self.positionX += self.moveX
+        self.positionY += self.moveY
 
-        pygame.draw.rect(window,(0,0,255),(120,120,400,240))
+class levelOne(game):
+    def __init__(self):
+        super().__init__()
+        pygame.display.set_caption("Level One")
+    def render(self):
+        self.window.fill((0,0,255))
+        pygame.draw.rect(self.window, (0,0,0),(self.positionX, self.positionY, 50,50))
         pygame.display.update()
-    pygame.quit()    
+
+    def run(self):
+        while self.running:
+            self.process()
+            self.update()
+            self.render()
+            self.clockRate.tick(60)
+
+
+
 
 def main():
     pygame.init()
     root = tk.Tk()
-    menuWindow = menus(root)
+    menuWindow = launcher(root)
     menuWindow.setUpMain()
     root.mainloop()
 
