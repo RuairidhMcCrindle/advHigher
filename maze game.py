@@ -124,8 +124,10 @@ class game():
         self.clockRate = pygame.time.Clock()
         self.positionX = 0
         self.positionY = 0
-        self.moveX = 0
-        self.moveY = 0
+        self.posMoveX = 0
+        self.posMoveY = 0
+        self.negMoveX = 0
+        self.negMoveY = 0
         self.running = True
     def process(self):
         self.moveX = 0
@@ -140,18 +142,18 @@ class game():
                     self.running = False
                     break
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.moveY -= 10
+                    self.negMoveY += 1
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.moveY += 10
+                    self.posMoveY += 1
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.moveX += 10
+                    self.posMoveX += 1
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.moveX -= 10
+                    self.negMoveX += 1
                 
             
     def update(self):
-        self.positionX += self.moveX
-        self.positionY += self.moveY
+        self.positionX += ((self.posMoveX * 10) + (self.negMoveX * (-10)))
+        self.positionY += ((self.posMoveY * 10) + (self.negMoveY * (-10)))
 
     def run(self):
         while self.running:
