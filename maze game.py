@@ -124,10 +124,10 @@ class game():
         self.clockRate = pygame.time.Clock()
         self.positionX = 0
         self.positionY = 0
-        self.posMoveX = 0
-        self.posMoveY = 0
-        self.negMoveX = 0
-        self.negMoveY = 0
+        self.posMoveX = 10
+        self.posMoveY = 10
+        self.negMoveX = 10
+        self.negMoveY = 10
         self.totalX = 0
         self.totalY = 0
         self.running = True
@@ -154,8 +154,8 @@ class game():
                 
             
     def update(self):
-        self.totalX = ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5)))
-        self.totalY = ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5)))
+        self.totalX = ((2^(self.posMoveX - 10)) + (2^(self.negMoveX - 10)))
+        self.totalY = ((2^(self.posMoveY - 10)) + (2^(self.negMoveY - 10)))
         if self.positionX + self.totalX < 0 or self.positionX + self.totalX > 1045 or self.positionY + self.totalY < 0 or self.positionY + self.totalY > 650:
             pass
         else:
