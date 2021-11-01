@@ -19,7 +19,7 @@ class launcher():
         #makes list from 0-18 inclusive        
         self.rowColumn = list(range(19))
 
-        self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, background = "dark blue")
+        self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, background = "#004ecc")
         self.mainFrame.columnconfigure(self.rowColumn, minsize = 40, weight = 1)
         self.mainFrame.rowconfigure(self.rowColumn, minsize = 35)
         self.mainFrame.pack(fill = tk.BOTH, expand = True)
@@ -31,14 +31,14 @@ class launcher():
         self.mainMenu = tk.Button(self.mainFrame, text = "Main Menu", command = self.setUpMain, font = ("Helvetica", 12))
 
         #main menu widgets
-        self.mainTitle = tk.Label(self.mainFrame, text= "Welcome to McCrindle's Maze", fg = "white", bg = "dark blue", font = ("Helvetica", 20))
+        self.mainTitle = tk.Label(self.mainFrame, text= "Welcome to McCrindle's Maze", fg = "light grey", bg = "#004ecc", font = ("Helvetica", 20))
         self.levelSelect = tk.Button(self.mainFrame, text = "Select Level", command = self.setUpSelect, font = ("Helvetica", 12))
         self.leaderboard = tk.Button(self.mainFrame, text = "Open Leaderboard", command = self.setUpLeaderboard, font = ("Helvetica", 12))
         self.login = tk.Button(self.mainFrame, text = "Login", command = self.setUpLogin, font = ("Helvetica", 12))
         self.signUp = tk.Button(self.mainFrame, text = "Sign Up", command = self.setUpSignUp, font = ("Helvetica", 12))
 
         #level select widgets
-        self.selectTitle = tk.Label(self.mainFrame, text = "Level Select", fg = "white", bg = "dark blue", font = ("Helvetica", 20))
+        self.selectTitle = tk.Label(self.mainFrame, text = "Level Select", fg = "light grey", bg = "#004ecc", font = ("Helvetica", 20))
         self.selectOne = tk.Button(self.mainFrame, text = "Level One", command = self.levelOne, font = ("Helvetica", 12))
         self.selectTwo = tk.Button(self.mainFrame, text = "Level Two", command = self.levelTwo, font = ("Helvetica", 12))
         self.selectThree = tk.Button(self.mainFrame, text = "Level Three", command = self.levelThree, font = ("Helvetica", 12))
@@ -46,7 +46,7 @@ class launcher():
         self.selectFive = tk.Button(self.mainFrame, text = "Level Five", command = self.levelFive, font = ("Helvetica", 12))
 
         #leaderboard widgets
-        self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "dark blue", font = ("Helvetica", 20))
+        self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "light grey", bg = "#004ecc", font = ("Helvetica", 20))
         
     
 
@@ -120,20 +120,13 @@ class game():
     def __init__(self):
         pygame.init()
         pygame.key.set_repeat(500,25)
-        self.window = pygame.display.set_mode((1095, 700))
+        self.window = pygame.display.set_mode((1920, 1080))
         self.clockRate = pygame.time.Clock()
-        self.positionX = 0
-        self.positionY = 0
-        self.posMoveX = 0
-        self.posMoveY = 0
-        self.negMoveX = 0
-        self.negMoveY = 0
-        self.totalX = 0
-        self.totalY = 0
+        self.position = {"x": 0, "y":0}
+        self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
+        self.totalMove = {"x": 0,"y": 0}
         self.running = True
     def process(self):
-        self.moveX = 0
-        self.moveY = 0
         self.eventList = pygame.event.get()
         for event in self.eventList:
             if event.type == pygame.QUIT:
@@ -144,23 +137,29 @@ class game():
                     self.running = False
                     break
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                    self.negMoveY += 1
+                    self.move["y neg"] += 1
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                    self.posMoveY += 1
+                    self.move["y pos"] += 1
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                    self.posMoveX += 1
+                    self.move["x pos"] += 1
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                    self.negMoveX += 1
+                    self.move["x neg"] += 1
                 
             
     def update(self):
-        self.totalX = ((self.posMoveX * 0.5) + (self.negMoveX * (-0.5)))
-        self.totalY = ((self.posMoveY * 0.5) + (self.negMoveY * (-0.5)))
-        if self.positionX + self.totalX < 0 or self.positionX + self.totalX > 1045 or self.positionY + self.totalY < 0 or self.positionY + self.totalY > 650:
-            pass
+        self.totalMove["x"] = ((self.move["x pos"] * 0.5) + (self.move["x neg"] * (-0.5)))
+        self.totalMove["y"] = ((self.move["y pos"] * 0.5) + (self.move["y neg"] * (-0.5)))
+        if self.position["x"] + self.totalMove["x"] < 0 or self.position["x"] + self.totalMove["x"] > 1870 or self.position["y"] + self.totalMove["y"] < 0 or self.position["y"] + self.totalMove["y"] > 1030:
+            self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 10,10,10,10
+            self.position["x"], self.position["y"] = 0,0
         else:
-            self.positionX += self.totalX
-            self.positionY += self.totalY
+            self.position["x"] += self.totalMove["x"]
+            self.position["y"] += self.totalMove["y"]
+            if self.totalMove["x"] == 0:
+                self.move["x pos"], self.move["x neg"] = 10, 10
+            if self.totalMove["y"] == 0:
+                self.move["y pos"], self.move["y neg"] = 10, 10
+
 
     def run(self):
         while self.running:
@@ -174,8 +173,8 @@ class levelOne(game):
         super().__init__()
         pygame.display.set_caption("Level One")
     def render(self):
-        self.window.fill((0,0,255))
-        pygame.draw.rect(self.window, (0,0,0),(self.positionX, self.positionY, 50,50))
+        self.window.fill((0,78,204))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
 
 
