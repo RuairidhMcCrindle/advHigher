@@ -120,7 +120,7 @@ class game():
     def __init__(self):
         pygame.init()
         pygame.key.set_repeat(500,25)
-        self.window = pygame.display.set_mode((1920, 1080))
+        self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
         self.position = {"x": 0, "y":0}
         self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
@@ -149,7 +149,7 @@ class game():
     def update(self):
         self.totalMove["x"] = (((2)**(self.move["x pos"] - 10)) - ((2)**(self.move["x neg"] - 10)))
         self.totalMove["y"] = (((2)**(self.move["y pos"] - 10)) - ((2)**(self.move["y neg"] - 10)))
-        if self.position["x"] + self.totalMove["x"] < 0 or self.position["x"] + self.totalMove["x"] > 1870 or self.position["y"] + self.totalMove["y"] < 0 or self.position["y"] + self.totalMove["y"] > 1030:
+        if self.position["x"] + self.totalMove["x"] < 0 or self.position["x"] + self.totalMove["x"] > 1045 or self.position["y"] + self.totalMove["y"] < 0 or self.position["y"] + self.totalMove["y"] > 650:
             self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 0,0,0,0
             self.position["x"], self.position["y"] = 0,0
         else:
