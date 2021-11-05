@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.constants import NSEW
 import pygame
+from pygame import Vector2 as vector
 
 
 
@@ -10,6 +11,8 @@ class launcher():
     def __init__(self, window):
         #general widgets
         self.window = window
+        self.congratsWindow = tk.Toplevel(window)
+        self.congratsWindow.withdraw()
 
         #sets window dimensions, and makes it so that the size cannot be changed
         self.window.geometry("1095x700")
@@ -99,6 +102,8 @@ class launcher():
         self.firstLevel = levelOne()
         self.firstLevel.run()
         pygame.quit()
+        if self.firstLevel.win == True:
+            self.congrats()
         
 
     def levelTwo(self):
@@ -113,6 +118,9 @@ class launcher():
     def levelFive(self):
         pass
 
+    def congrats(self):
+        self.congratsWindow.deiconify()
+
         
 
 
@@ -122,9 +130,29 @@ class game():
         pygame.key.set_repeat(500,25)
         self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
+        #each block in maze is 73 by 70
+        #therefore each row is 15 blocks, and each column is 10 blocks
+        self.rowValues = [0,70,140,210,280,350,420,490,560,630] #the start y value for each row
+        self.columnValues = [0, 73, 146, 219, 292, 365, 438, 511, 584, 657, 730, 803, 876, 949, 1022] #the start x value for each coumn
+        self.pathBlocks = [
+            [], #first row
+            [], #second row
+            [], #third row
+            [], #fourth row
+            [], #fifth row
+            [], #sixth row
+            [], #seventh row
+            [], #eighth row
+            [], #ninth row
+            []  #tenth row 
+        ]
+        self.rowValues = [0,70,140,210,280,350,420,490,560,630] #the start y value for each row
+        self.columnValues = [0, 73, 146, 219, 292, 365, 438, 511, 584, 657, 730, 803, 876, 949, 1022] #the start x value for each column
         self.position = {"x": 0, "y":0}
         self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
         self.totalMove = {"x": 0,"y": 0}
+        self.positionCheck = [False, False, False, False] #top left, top right, bottom right, bottom left. checks for whether any of the players corners are in a path block
+        self.win = False
         self.running = True
     def process(self):
         self.eventList = pygame.event.get()
@@ -153,15 +181,50 @@ class game():
             self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 0,0,0,0
             self.position["x"], self.position["y"] = 0,0
         else:
-            self.position["x"] += self.totalMove["x"]
-            self.position["y"] += self.totalMove["y"]
+            self.positionCheck = [False, False, False, False]
+            for i in range(0,10):
+                for j in self.pathBlocks[i]:
+                    if self.position["x"] + self.totalMove["x"] <= j.x + 73 and self.position["x"] + self.totalMove["x"] >= j.x and self.position["y"] + self.totalMove["y"] <= j.y + 70 and self.position["y"] + self.totalMove["y"] >= j.y:
+                        self.positionCheck[0] = True
+
+                    if self.position["x"] + self.totalMove["x"] + 50 <= j.x + 73 and self.position["x"] + self.totalMove["x"] + 50 >= j.x and self.position["y"] + self.totalMove["y"] <= j.y + 70 and self.position["y"] + self.totalMove["y"] >= j.y:
+                        self.positionCheck[1] = True
+
+                    if self.position["y"] + self.totalMove["y"] + 50 <= j.y + 70 and self.position["y"] + self.totalMove["y"] + 50 >= j.y and self.position["x"] + self.totalMove["x"] + 50 <= j.x + 73 and self.position["x"] + self.totalMove["x"] + 50 >= j.x:
+                        self.positionCheck[2] = True
+
+                    if self.position["y"] + self.totalMove["y"] + 50 <= j.y + 70 and self.position["y"] + self.totalMove["y"] + 50 >= j.y and self.position["x"] + self.totalMove["x"] <= j.x + 73 and self.position["x"] + self.totalMove["x"] >= j.x:
+                        self.positionCheck[3] = True
+                    
+            if self.positionCheck[0] == True and self.positionCheck[1] == True and self.positionCheck[2] == True and self.positionCheck[3] == True:
+                self.position["x"] += self.totalMove["x"]
+                self.position["y"] += self.totalMove["y"]
+            else:
+                self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 0,0,0,0
+                self.position["x"], self.position["y"] = 0,0
+
             if self.totalMove["x"] == 0:
                 self.move["x pos"], self.move["x neg"] = 10, 10
+
             if self.totalMove["y"] == 0:
                 self.move["y pos"], self.move["y neg"] = 10, 10
+            
+            if self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
+                self.win = True
+                self.running = False   
+
+            elif self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
+                self.win = True
+                self.running = False
+            elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14]:
+               self.win = True
+               self.running = False
+            elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14]:
+                self.win = True
+                self.running = False
 
     def run(self):
-        while self.running:
+        while self.running == True:
             self.process()
             self.update()
             self.render()
@@ -172,7 +235,23 @@ class levelOne(game):
         super().__init__()
         pygame.display.set_caption("Level One")
     def render(self):
-        self.window.fill((0,78,204))
+        self.pathBlocks = [
+            [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0])], #first row
+            [vector(self.columnValues[2], self.rowValues[1])], #second row
+            [vector(self.columnValues[2], self.rowValues[2])], #third row
+            [vector(self.columnValues[2], self.rowValues[3]), vector(self.columnValues[3], self.rowValues[3]), vector(self.columnValues[4], self.rowValues[3]), vector(self.columnValues[5], self.rowValues[3])], #fourth row
+            [vector(self.columnValues[5], self.rowValues[4])], #fifth row
+            [vector(self.columnValues[5], self.rowValues[5])], #sixth row
+            [vector(self.columnValues[5], self.rowValues[6]), vector(self.columnValues[6], self.rowValues[6]), vector(self.columnValues[7], self.rowValues[6]), vector(self.columnValues[8], self.rowValues[6]), vector(self.columnValues[9], self.rowValues[6])], #seventh row
+            [vector(self.columnValues[9], self.rowValues[7]), vector(self.columnValues[11], self.rowValues[7]), vector(self.columnValues[12], self.rowValues[7]), vector(self.columnValues[13], self.rowValues[7])], #eighth row
+            [vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
+            [vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
+        ]
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, (0,78,204), (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
         pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
 
