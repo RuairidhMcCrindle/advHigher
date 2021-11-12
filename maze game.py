@@ -107,16 +107,32 @@ class launcher():
         
 
     def levelTwo(self):
-        pass
+        self.secondLevel = levelTwo()
+        self.secondLevel.run()
+        pygame.quit()
+        if self.secondLevel.win == True:
+            self.congrats()
 
     def levelThree(self):
-        pass
+        self.thirdLevel = levelThree()
+        self.thirdLevel.run()
+        pygame.quit()
+        if self.thirdLevel.win == True:
+            self.congrats()
 
     def levelFour(self):
-        pass
+        self.fourthLevel = levelFour()
+        self.fourthLevel.run()
+        pygame.quit()
+        if self.fourthLevel.win == True:
+            self.congrats()
     
     def levelFive(self):
-        pass
+        self.fifthLevel = levelFive()
+        self.fifthLevel.run()
+        pygame.quit()
+        if self.fifthLevel.win == True:
+            self.congrats()
 
     def congrats(self):
         self.congratsWindow.deiconify()
@@ -251,6 +267,106 @@ class levelOne(game):
         for i in range(0,10):
             for j in self.pathBlocks[i]:
                 pygame.draw.rect(self.window, (0,78,204), (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+        pygame.display.update()
+
+class levelTwo(game):
+    def __init__(self):
+        super().__init__()
+        pygame.display.set_caption("Level Two")
+    def render(self):
+        self.pathBlocks = [
+            [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[6], self.rowValues[0]), vector(self.columnValues[7], self.rowValues[0]), vector(self.columnValues[8], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0]), vector(self.columnValues[10], self.rowValues[0]), vector(self.columnValues[11], self.rowValues[0]), vector(self.columnValues[12], self.rowValues[0]), vector(self.columnValues[13], self.rowValues[0]), vector(self.columnValues[14], self.rowValues[0])], #first row
+            [vector(self.columnValues[14], self.rowValues[1])], #second row
+            [vector(self.columnValues[14], self.rowValues[2])], #third row
+            [vector(self.columnValues[14], self.rowValues[3])], #fourth row
+            [vector(self.columnValues[14], self.rowValues[4])], #fifth row
+            [vector(self.columnValues[10], self.rowValues[5]), vector(self.columnValues[11], self.rowValues[5]), vector(self.columnValues[12], self.rowValues[5]), vector(self.columnValues[14], self.rowValues[5])], #sixth row
+            [vector(self.columnValues[10], self.rowValues[6]), vector(self.columnValues[12], self.rowValues[6]), vector(self.columnValues[14], self.rowValues[6])], #seventh row
+            [vector(self.columnValues[8], self.rowValues[7]), vector(self.columnValues[9], self.rowValues[7]), vector(self.columnValues[10], self.rowValues[7]), vector(self.columnValues[12], self.rowValues[7]), vector(self.columnValues[13], self.rowValues[7]), vector(self.columnValues[14], self.rowValues[7])], #eighth row
+            [vector(self.columnValues[8], self.rowValues[8])], #ninth row
+            [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
+        ]
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, (51,78,153), (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+        pygame.display.update()
+
+class levelThree(game):
+    def __init__(self):
+        super().__init__()
+        pygame.display.set_caption("Level Three")
+    def render(self):
+        self.pathBlocks = [
+            [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[7], self.rowValues[0]), vector(self.columnValues[8], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0])], #first row
+            [vector(self.columnValues[1], self.rowValues[1]), vector(self.columnValues[3], self.rowValues[1]), vector(self.columnValues[5], self.rowValues[1]), vector(self.columnValues[7], self.rowValues[1]), vector(self.columnValues[9], self.rowValues[1])], #second row
+            [vector(self.columnValues[1], self.rowValues[2]), vector(self.columnValues[2], self.rowValues[2]), vector(self.columnValues[3], self.rowValues[2]), vector(self.columnValues[5], self.rowValues[2]), vector(self.columnValues[7], self.rowValues[2]), vector(self.columnValues[9], self.rowValues[2])], #third row
+            [vector(self.columnValues[5], self.rowValues[3]), vector(self.columnValues[7], self.rowValues[3]), vector(self.columnValues[9], self.rowValues[3])], #fourth row
+            [vector(self.columnValues[2], self.rowValues[4]), vector(self.columnValues[3], self.rowValues[4]), vector(self.columnValues[4], self.rowValues[4]), vector(self.columnValues[5], self.rowValues[4]), vector(self.columnValues[7], self.rowValues[4]), vector(self.columnValues[9], self.rowValues[4])], #fifth row
+            [vector(self.columnValues[2], self.rowValues[5]), vector(self.columnValues[7], self.rowValues[5]), vector(self.columnValues[9], self.rowValues[5])], #sixth row
+            [vector(self.columnValues[2], self.rowValues[6]), vector(self.columnValues[3], self.rowValues[6]), vector(self.columnValues[4], self.rowValues[6]), vector(self.columnValues[5], self.rowValues[6]), vector(self.columnValues[6], self.rowValues[6]), vector(self.columnValues[7], self.rowValues[6]), vector(self.columnValues[9], self.rowValues[6])], #seventh row
+            [vector(self.columnValues[8], self.rowValues[7]), vector(self.columnValues[9], self.rowValues[7]), vector(self.columnValues[11], self.rowValues[7]), vector(self.columnValues[12], self.rowValues[7]), vector(self.columnValues[13], self.rowValues[7])], #eighth row
+            [vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8])], #ninth row
+            [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
+        ]
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, (102,78,102), (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+        pygame.display.update()
+
+class levelFour(game):
+    def __init__(self):
+        super().__init__()
+        pygame.display.set_caption("Level Four")
+    def render(self):
+        self.pathBlocks = [
+            [vector(self.columnValues[0], self.rowValues[0])], #first row
+            [vector(self.columnValues[0], self.rowValues[1]), vector(self.columnValues[1], self.rowValues[1]), vector(self.columnValues[2], self.rowValues[1])], #second row
+            [vector(self.columnValues[2], self.rowValues[2]), vector(self.columnValues[4], self.rowValues[2]), vector(self.columnValues[5], self.rowValues[2]), vector(self.columnValues[6], self.rowValues[2]), vector(self.columnValues[8], self.rowValues[2]), vector(self.columnValues[9], self.rowValues[2]), vector(self.columnValues[10], self.rowValues[2]), vector(self.columnValues[11], self.rowValues[2]), vector(self.columnValues[12], self.rowValues[2]), vector(self.columnValues[13], self.rowValues[2]), vector(self.columnValues[14], self.rowValues[2])], #third row
+            [vector(self.columnValues[1], self.rowValues[3]), vector(self.columnValues[2], self.rowValues[3]), vector(self.columnValues[4], self.rowValues[3]), vector(self.columnValues[6], self.rowValues[3]), vector(self.columnValues[8], self.rowValues[3]), vector(self.columnValues[14], self.rowValues[3])], #fourth row
+            [vector(self.columnValues[1], self.rowValues[4]), vector(self.columnValues[4], self.rowValues[4]), vector(self.columnValues[6], self.rowValues[4]), vector(self.columnValues[8], self.rowValues[4]), vector(self.columnValues[10], self.rowValues[4]), vector(self.columnValues[11], self.rowValues[4]), vector(self.columnValues[12], self.rowValues[4]), vector(self.columnValues[14], self.rowValues[4])], #fifth row
+            [vector(self.columnValues[1], self.rowValues[5]), vector(self.columnValues[2], self.rowValues[5]), vector(self.columnValues[3], self.rowValues[5]), vector(self.columnValues[4], self.rowValues[5]), vector(self.columnValues[6], self.rowValues[5]), vector(self.columnValues[8], self.rowValues[5]), vector(self.columnValues[10], self.rowValues[5]), vector(self.columnValues[12], self.rowValues[5]), vector(self.columnValues[14], self.rowValues[5])], #sixth row
+            [vector(self.columnValues[5], self.rowValues[6]), vector(self.columnValues[6], self.rowValues[6]), vector(self.columnValues[8], self.rowValues[6]), vector(self.columnValues[9], self.rowValues[6]), vector(self.columnValues[10], self.rowValues[6]), vector(self.columnValues[12], self.rowValues[6]), vector(self.columnValues[14], self.rowValues[6])], #seventh row
+            [vector(self.columnValues[5], self.rowValues[7]), vector(self.columnValues[12], self.rowValues[7]), vector(self.columnValues[14], self.rowValues[7])], #eighth row
+            [vector(self.columnValues[5], self.rowValues[8]), vector(self.columnValues[6], self.rowValues[8]), vector(self.columnValues[7], self.rowValues[8]), vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[10], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[12], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
+            [vector(self.columnValues[14], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
+        ]
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, (153,78,51), (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+        pygame.display.update()
+
+class levelFive(game):
+    def __init__(self):
+        super().__init__()
+        pygame.display.set_caption("Level Five")
+    def render(self):
+        self.pathBlocks = [
+            [vector(self.columnValues[0], self.rowValues[0])], #first row
+            [], #second row
+            [], #third row
+            [], #fourth row
+            [], #fifth row
+            [], #sixth row
+            [], #seventh row
+            [], #eighth row
+            [], #ninth row
+            []  #tenth row 
+        ]
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, (204,78,0), (j.x, j.y, 73, 70))
         pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
         pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
