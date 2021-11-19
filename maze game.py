@@ -11,7 +11,7 @@ class launcher():
         #general widgets
         self.window = window
         self.congratsWindow = tk.Toplevel(window, bg = "#004ecc")
-        #self.congratsWindow.withdraw()
+        self.congratsWindow.withdraw()
         self.congratsWindow.protocol("WM_DELETE_WINDOW", self.congratsWindow.withdraw)
 
         #sets window dimensions, and makes it so that the size cannot be changed
@@ -19,8 +19,8 @@ class launcher():
         self.window.minsize(1095,700)
         self.window.maxsize(1095,700)
         self.congratsWindow.geometry("325x100")
-        #self.congratsWindow.minsize(325,100)
-        #self.congratsWindow.maxsize(325,100)
+        self.congratsWindow.minsize(325,100)
+        self.congratsWindow.maxsize(325,100)
 
         #makes lists from 0-(n-1) inclusive        
         self.rowColumn = list(range(19))
