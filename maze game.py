@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter.constants import NSEW
 import pygame
 from pygame import Vector2 as vector
 
@@ -11,21 +10,26 @@ class launcher():
     def __init__(self, window):
         #general widgets
         self.window = window
-        self.congratsWindow = tk.Toplevel(window)
-        self.congratsWindow.withdraw()
+        self.congratsWindow = tk.Toplevel(window, bg = "#004ecc")
+        #self.congratsWindow.withdraw()
+        self.congratsWindow.protocol("WM_DELETE_WINDOW", self.congratsWindow.withdraw)
 
         #sets window dimensions, and makes it so that the size cannot be changed
         self.window.geometry("1095x700")
         self.window.minsize(1095,700)
         self.window.maxsize(1095,700)
+        self.congratsWindow.geometry("325x100")
+        #self.congratsWindow.minsize(325,100)
+        #self.congratsWindow.maxsize(325,100)
 
-        #makes list from 0-18 inclusive        
+        #makes lists from 0-(n-1) inclusive        
         self.rowColumn = list(range(19))
-
-        self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, background = "#004ecc")
+        self.row = list(range(2))
+        #sets up grids and frames for windows
+        self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
         self.mainFrame.columnconfigure(self.rowColumn, minsize = 40, weight = 1)
         self.mainFrame.rowconfigure(self.rowColumn, minsize = 35)
-        self.mainFrame.pack(fill = tk.BOTH, expand = True)
+        self.mainFrame.pack(fill = "both", expand = True)
         self.window.title("McCrindle's Maze")
 
         #common widgets
@@ -51,7 +55,11 @@ class launcher():
         #leaderboard widgets
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         
-    
+        #congrats window widget
+        self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.congratsTitle.pack(pady=(0,30))
+        self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
+        self.congratsButton.pack()
 
 
     def setUpMain(self):
@@ -77,10 +85,6 @@ class launcher():
         self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 290)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
-
-
-
-
 
     def setUpLeaderboard(self):
         for widget in self.mainFrame.winfo_children():
@@ -352,16 +356,16 @@ class levelFive(game):
         pygame.display.set_caption("Level Five")
     def render(self):
         self.pathBlocks = [
-            [vector(self.columnValues[0], self.rowValues[0])], #first row
-            [], #second row
-            [], #third row
-            [], #fourth row
-            [], #fifth row
-            [], #sixth row
-            [], #seventh row
-            [], #eighth row
-            [], #ninth row
-            []  #tenth row 
+            [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0]), vector(self.columnValues[10], self.rowValues[0]), vector(self.columnValues[11], self.rowValues[0]), vector(self.columnValues[12], self.rowValues[0])], #first row
+            [vector(self.columnValues[0], self.rowValues[1]), vector(self.columnValues[2], self.rowValues[1]), vector(self.columnValues[5], self.rowValues[1]), vector(self.columnValues[9], self.rowValues[1]), vector(self.columnValues[12], self.rowValues[1])], #second row
+            [vector(self.columnValues[0], self.rowValues[2]), vector(self.columnValues[2], self.rowValues[2]), vector(self.columnValues[4], self.rowValues[2]), vector(self.columnValues[5], self.rowValues[2]), vector(self.columnValues[9], self.rowValues[2]), vector(self.columnValues[11], self.rowValues[2]), vector(self.columnValues[12], self.rowValues[2])], #third row
+            [vector(self.columnValues[0], self.rowValues[3]), vector(self.columnValues[2], self.rowValues[3]), vector(self.columnValues[4], self.rowValues[3]), vector(self.columnValues[9], self.rowValues[3]), vector(self.columnValues[11], self.rowValues[3])], #fourth row
+            [vector(self.columnValues[0], self.rowValues[4]), vector(self.columnValues[2], self.rowValues[4]), vector(self.columnValues[4], self.rowValues[4]), vector(self.columnValues[5], self.rowValues[4]), vector(self.columnValues[6], self.rowValues[4]), vector(self.columnValues[9], self.rowValues[4]), vector(self.columnValues[11], self.rowValues[4])], #fifth row
+            [vector(self.columnValues[0], self.rowValues[5]), vector(self.columnValues[2], self.rowValues[5]), vector(self.columnValues[6], self.rowValues[5]), vector(self.columnValues[8], self.rowValues[5]), vector(self.columnValues[9], self.rowValues[5]), vector(self.columnValues[11], self.rowValues[5]), vector(self.columnValues[12], self.rowValues[5]), vector(self.columnValues[13], self.rowValues[5])], #sixth row
+            [vector(self.columnValues[0], self.rowValues[6]), vector(self.columnValues[2], self.rowValues[6]), vector(self.columnValues[3], self.rowValues[6]), vector(self.columnValues[4], self.rowValues[6]), vector(self.columnValues[6], self.rowValues[6]), vector(self.columnValues[8], self.rowValues[6]), vector(self.columnValues[13], self.rowValues[6])], #seventh row
+            [vector(self.columnValues[0], self.rowValues[7]), vector(self.columnValues[4], self.rowValues[7]), vector(self.columnValues[6], self.rowValues[7]), vector(self.columnValues[8], self.rowValues[7]), vector(self.columnValues[9], self.rowValues[7]), vector(self.columnValues[12], self.rowValues[7]), vector(self.columnValues[13], self.rowValues[7])], #eighth row
+            [vector(self.columnValues[0], self.rowValues[8]), vector(self.columnValues[4], self.rowValues[8]), vector(self.columnValues[6], self.rowValues[8]), vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[12], self.rowValues[8])], #ninth row
+            [vector(self.columnValues[0], self.rowValues[9]), vector(self.columnValues[1], self.rowValues[9]), vector(self.columnValues[2], self.rowValues[9]), vector(self.columnValues[3], self.rowValues[9]), vector(self.columnValues[4], self.rowValues[9]), vector(self.columnValues[6], self.rowValues[9]), vector(self.columnValues[7], self.rowValues[9]), vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
         self.window.fill((204,82,0))
         for i in range(0,10):
