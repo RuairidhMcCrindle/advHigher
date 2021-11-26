@@ -28,7 +28,7 @@ class launcher():
         self.row = list(range(2))
         #sets up grids and frames for windows
         self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
-        self.mainFrame.columnconfigure(self.rowColumn, weight = 1)
+        self.mainFrame.columnconfigure(9, weight = 1)
         self.mainFrame.rowconfigure(self.rowColumn, minsize = 35)
         self.mainFrame.pack(fill = "both", expand = True)
         self.window.title("McCrindle's Maze")
@@ -36,14 +36,14 @@ class launcher():
         #common widgets
         #ideally all buttons should be 375 pixels wide and 32 pixels high
         self.quitButton = tk.Button(self.mainFrame, text = "Exit Game", command = self.window.destroy, font = ("Helvetica", 12))
-        self.mainMenu = tk.Button(self.mainFrame, text = "Main Menu", command = self.setUpMain, font = ("Helvetica", 12))
+        self.mainMenu = tk.Button(self.mainFrame, text = "Return", command = self.setUpMain, font = ("Helvetica", 12))
 
         #main menu widgets
         self.mainTitle = tk.Label(self.mainFrame, text= "Welcome to McCrindle's Maze", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.levelSelect = tk.Button(self.mainFrame, text = "Select Level", command = self.setUpSelect, font = ("Helvetica", 12))
         self.leaderboard = tk.Button(self.mainFrame, text = "Open Leaderboard", command = self.setUpLeaderboard, font = ("Helvetica", 12))
         self.login = tk.Button(self.mainFrame, text = "Login", command = self.setUpLogin, font = ("Helvetica", 12))
-        self.signUp = tk.Button(self.mainFrame, text = "Sign Up", command = self.setUpSignUp, font = ("Helvetica", 12))
+        self.signUp = tk.Button(self.mainFrame, text = "New Account", command = self.setUpSignUp, font = ("Helvetica", 12))
 
         #level select widgets
         self.selectTitle = tk.Label(self.mainFrame, text = "Level Select", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
@@ -89,7 +89,7 @@ class launcher():
         self.levelSelect.grid(column = 9, row = 14, pady = 2, ipadx = 138)
         self.leaderboard.grid(column = 9, row = 15, pady = 2, ipadx = 114)
         self.login.grid(column = 9, row = 16, pady = 2, ipadx = 161)
-        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 152)
+        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 135)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
 
@@ -103,14 +103,14 @@ class launcher():
         self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 140)
         self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 144)
         self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 143)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
     def setUpLeaderboard(self):
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.leaderboardTitle.grid(column = 9, row = 0)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
     def setUpLogin(self):
@@ -120,8 +120,9 @@ class launcher():
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.signUpTitle.grid(column = 9, row = 0)
-        self.userNameTitle.grid(column = 3, row = 2, ipadx = 150)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
+        self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
+        self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
         
 
