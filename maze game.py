@@ -1,6 +1,7 @@
 import tkinter as tk
 import pygame
 from pygame import Vector2 as vector
+import mysql.connector
 
 
 
@@ -27,7 +28,7 @@ class launcher():
         self.row = list(range(2))
         #sets up grids and frames for windows
         self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
-        self.mainFrame.columnconfigure(self.rowColumn, minsize = 40, weight = 1)
+        self.mainFrame.columnconfigure(self.rowColumn, weight = 1)
         self.mainFrame.rowconfigure(self.rowColumn, minsize = 35)
         self.mainFrame.pack(fill = "both", expand = True)
         self.window.title("McCrindle's Maze")
@@ -54,12 +55,31 @@ class launcher():
 
         #leaderboard widgets
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+
+        #signup widgets
+        self.signUpTitle = tk.Label(self.mainFrame, text = "Sign Up", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.userNameTitle = tk.Label(self.mainFrame, text = "Username", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
+        self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica",8))
         
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.congratsTitle.pack(pady=(0,30))
         self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
         self.congratsButton.pack()
+
+        #database stuff
+        self.myDB = mysql.connector.connect(
+            host = "localhost",
+            user = "ruairidh",
+            password ="password",
+            database = "mazeGame"
+        )
+        self.myCursor = self.myDB.cursor()
+        self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
+        self.values = []
+        #self.myCursor.execute(self.newUser, self.values)
+        #self.myDB.commit()
+
 
 
     def setUpMain(self):
@@ -68,8 +88,8 @@ class launcher():
         self.mainTitle.grid(column = 9, row = 0)
         self.levelSelect.grid(column = 9, row = 14, pady = 2, ipadx = 138)
         self.leaderboard.grid(column = 9, row = 15, pady = 2, ipadx = 114)
-        self.login.grid(column = 9, row = 16, pady = 2, ipadx = 322)
-        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 305)
+        self.login.grid(column = 9, row = 16, pady = 2, ipadx = 161)
+        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 152)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
 
@@ -78,12 +98,12 @@ class launcher():
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
-        self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 291)
-        self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 291)
-        self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 290)
-        self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 288)
-        self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 290)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
+        self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 145)
+        self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 145)
+        self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 140)
+        self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 144)
+        self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 143)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
     def setUpLeaderboard(self):
@@ -97,7 +117,13 @@ class launcher():
         pass
 
     def setUpSignUp(self):
-        pass
+        for widget in self.mainFrame.winfo_children():
+            widget.grid_forget()
+        self.signUpTitle.grid(column = 9, row = 0)
+        self.userNameTitle.grid(column = 3, row = 2, ipadx = 150)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
+        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        
 
     def popUpWindow(self):
         pass
