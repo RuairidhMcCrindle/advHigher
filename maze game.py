@@ -2,6 +2,7 @@ import tkinter as tk
 import pygame
 from pygame import Vector2 as vector
 import mysql.connector
+from tkinter import messagebox
 
 
 
@@ -56,10 +57,14 @@ class launcher():
         #leaderboard widgets
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
 
-        #signup widgets
+        #signup/login widgets
         self.signUpTitle = tk.Label(self.mainFrame, text = "Sign Up", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.userNameTitle = tk.Label(self.mainFrame, text = "Username", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
-        self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica",8))
+        self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10))
+        self.passwordTitle = tk.Label(self.mainFrame, text = "Password", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
+        self.passwordInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10), show = "*")
+        self.signUpButton = tk.Button(self.mainFrame, text = "Create Account" , command = self.sqlSignUp, font = ("Helvetica", 12))
+        self.loginButton = tk.Button(self.mainFrame, text = "Login" , command = self.sqlLogin, font = ("Helvetica", 12))
         
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
@@ -76,9 +81,8 @@ class launcher():
         )
         self.myCursor = self.myDB.cursor()
         self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
-        self.values = []
-        #self.myCursor.execute(self.newUser, self.values)
-        #self.myDB.commit()
+        self.userCheck = "SELECT username, password FROM Users WHERE %s, %s"
+        self.sqlValues = []
 
 
 
@@ -122,8 +126,13 @@ class launcher():
         self.signUpTitle.grid(column = 9, row = 0)
         self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
         self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
+        self.passwordTitle.grid(column = 9, row = 4, padx = (0,1000))
+        self.passwordInput.grid(column = 9, row = 5, padx = (0,948))
+        self.signUpButton.grid(column= 9, row = 16, pady = 2, ipadx = 126)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.userNameInput.delete(0,"end")
+        self.passwordInput.delete(0,"end")
         
 
     def popUpWindow(self):
@@ -167,7 +176,22 @@ class launcher():
 
     def congrats(self):
         self.congratsWindow.deiconify()
+    
+    def sqlSignUp(self):
+        try:
+            #make sure that user has not entered nothing as username and password, and make sure to account for other errors
+            self.sqlValues.clear()
+            self.sqlValues.append(self.userNameInput.get())
+            self.sqlValues.append(self.passwordInput.get())
+            self.myCursor.execute(self.newUser, self.sqlValues)
+            self.myDB.commit()
+            self.setUpMain()
+        except mysql.connector.errors.IntegrityError:
+            messagebox.showerror(title = "Error", message = "That username is already taken")
 
+    def sqlLogin(self):
+        self.myCursor.execute(self.userCheck, self.sqlValues)
+        self.myDB.commit()
         
 
 
