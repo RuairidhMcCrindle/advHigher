@@ -58,7 +58,8 @@ class launcher():
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
 
         #signup/login widgets
-        self.signUpTitle = tk.Label(self.mainFrame, text = "Sign Up", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.signUpTitle = tk.Label(self.mainFrame, text = "New Account", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.loginTitle = tk.Label(self.mainFrame, text = "Login", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.userNameTitle = tk.Label(self.mainFrame, text = "Username", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
         self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10))
         self.passwordTitle = tk.Label(self.mainFrame, text = "Password", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
@@ -81,8 +82,10 @@ class launcher():
         )
         self.myCursor = self.myDB.cursor()
         self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
-        self.userCheck = "SELECT username, password FROM Users WHERE %s, %s"
+        self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
+        self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
         self.sqlValues = []
+        self.sqlResult = []
 
 
 
@@ -98,17 +101,21 @@ class launcher():
 
 
     def setUpSelect(self):
-        #note: checks must be done to ensure an account is logged in before opening level select menu. implement after login system is implemented
-        for widget in self.mainFrame.winfo_children():
-            widget.grid_forget()
-        self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
-        self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 145)
-        self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 145)
-        self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 140)
-        self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 144)
-        self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
-        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        try:
+            if self.sqlValues == []:
+                raise Exception
+            for widget in self.mainFrame.winfo_children():
+                widget.grid_forget()
+            self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
+            self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 145)
+            self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 145)
+            self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 140)
+            self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 144)
+            self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
+            self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
+            self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        except Exception:
+            messagebox.showerror(title = "Error", message = "Please login to an account before playing")
 
     def setUpLeaderboard(self):
         for widget in self.mainFrame.winfo_children():
@@ -118,7 +125,18 @@ class launcher():
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
     def setUpLogin(self):
-        pass
+        for widget in self.mainFrame.winfo_children():
+            widget.grid_forget()
+        self.loginTitle.grid(column = 9, row = 0)
+        self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
+        self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
+        self.passwordTitle.grid(column = 9, row = 4, padx = (0,1000))
+        self.passwordInput.grid(column = 9, row = 5, padx = (0,948))
+        self.loginButton.grid(column= 9, row = 16, pady = 2, ipadx = 161)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
+        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.userNameInput.delete(0,"end")
+        self.passwordInput.delete(0,"end")
 
     def setUpSignUp(self):
         for widget in self.mainFrame.winfo_children():
@@ -179,19 +197,47 @@ class launcher():
     
     def sqlSignUp(self):
         try:
-            #make sure that user has not entered nothing as username and password, and make sure to account for other errors
+            #mysql checks not currently working, wait for that fix before implementing further errors
             self.sqlValues.clear()
             self.sqlValues.append(self.userNameInput.get())
             self.sqlValues.append(self.passwordInput.get())
+            if self.sqlValues[0] == "":
+                raise WrongUsername
+            elif self.sqlValues[1] == "":
+                raise WrongPassword
             self.myCursor.execute(self.newUser, self.sqlValues)
             self.myDB.commit()
             self.setUpMain()
         except mysql.connector.errors.IntegrityError:
+            self.sqlValues.clear()
             messagebox.showerror(title = "Error", message = "That username is already taken")
+        except WrongUsername:
+            self.sqlValues.clear()
+            messagebox.showerror(title = "Error", message = "Please enter a valid username")
+        except WrongPassword:
+            self.sqlValues.clear()
+            messagebox.showerror(title = "Error", message = "Please enter a valid password")
 
     def sqlLogin(self):
-        self.myCursor.execute(self.userCheck, self.sqlValues)
-        self.myDB.commit()
+        try:
+            self.sqlValues.clear()
+            self.sqlValues.append(self.userNameInput.get())
+            self.myCursor.execute(self.userNameCheck, self.sqlValues)
+            self.sqlResult = self.myCursor.fetchall()
+            if self.sqlResult == []:
+                raise WrongUsername
+            self.sqlValues.append(self.passwordInput.get())
+            self.myCursor.execute(self.passwordCheck, self.sqlValues)
+            self.sqlResult = self.myCursor.fetchall()
+            if self.sqlResult == []:
+                raise WrongPassword
+            self.setUpMain()
+        except WrongUsername:
+            self.sqlValues.clear()
+            messagebox.showerror(title = "Error", message = "That username is incorrect")
+        except WrongPassword:
+            self.sqlValues.clear()
+            messagebox.showerror(title = "Error", message = "That password is incorrect")
         
 
 
@@ -426,8 +472,11 @@ class levelFive(game):
         pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
 
-
-
+#error definitions for sql
+class WrongUsername(Exception):
+    pass
+class WrongPassword(Exception):
+    pass
 
 
 
