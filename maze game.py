@@ -3,6 +3,7 @@ import pygame
 from pygame import Vector2 as vector
 import mysql.connector
 from tkinter import messagebox
+from time import time
 
 
 
@@ -69,7 +70,9 @@ class launcher():
         
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-        self.congratsTitle.pack(pady=(0,30))
+        self.congratsTitle.pack()
+        self.completedTime = tk.Label(self.congratsWindow, text = "among", fg = "white", bg = "#004ecc", font = ("Helvetica", 16))
+        self.completedTime.pack(pady=(0,5))
         self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
         self.congratsButton.pack()
 
@@ -84,8 +87,14 @@ class launcher():
         self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
         self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
         self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
-        self.sqlValues = []
+        self.newTime = "INSERT INTO mazetimes (time, level, userName) VALUES (%s,%s,%s)"
+        self.sqlUserValues = []
+        self.sqlTimeValues = []
         self.sqlResult = []
+        self.time = 0.0
+
+
+
 
 
 
@@ -102,7 +111,7 @@ class launcher():
 
     def setUpSelect(self):
         try:
-            if self.sqlValues == []:
+            if self.sqlUserValues == []:
                 raise Exception
             for widget in self.mainFrame.winfo_children():
                 widget.grid_forget()
@@ -160,8 +169,9 @@ class launcher():
         self.firstLevel = levelOne()
         self.firstLevel.run()
         pygame.quit()
+        print(self.firstLevel.endTime - self.firstLevel.startTime)
         if self.firstLevel.win == True:
-            self.congrats()
+            self.congrats(1)
         
 
     def levelTwo(self):
@@ -169,81 +179,111 @@ class launcher():
         self.secondLevel.run()
         pygame.quit()
         if self.secondLevel.win == True:
-            self.congrats()
+            self.congrats(2)
 
     def levelThree(self):
         self.thirdLevel = levelThree()
         self.thirdLevel.run()
         pygame.quit()
         if self.thirdLevel.win == True:
-            self.congrats()
+            self.congrats(3)
 
     def levelFour(self):
         self.fourthLevel = levelFour()
         self.fourthLevel.run()
         pygame.quit()
         if self.fourthLevel.win == True:
-            self.congrats()
+            self.congrats(4)
     
     def levelFive(self):
         self.fifthLevel = levelFive()
         self.fifthLevel.run()
         pygame.quit()
         if self.fifthLevel.win == True:
-            self.congrats()
+            self.congrats(5)
 
-    def congrats(self):
+    def congrats(self, level):
+        if level  == 1:
+            self.time = round(self.firstLevel.endTime - self.firstLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 2:
+            self.time = round(self.secondLevel.endTime - self.secondLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 3:
+            self.time = round(self.thirdLevel.endTime - self.thirdLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 4:
+            self.time = round(self.fourthLevel.endTime - self.fourthLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 5:
+            self.time = round(self.fifthLevel.endTime - self.fifthLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
         self.congratsWindow.deiconify()
     
     def sqlSignUp(self):
         try:
             #mysql checks not currently working, wait for that fix before implementing further errors
-            self.sqlValues.clear()
-            self.sqlValues.append(self.userNameInput.get())
-            self.sqlValues.append(self.passwordInput.get())
-            if self.sqlValues[0] == "":
+            self.sqlUserValues.clear()
+            self.sqlUserValues.append(self.userNameInput.get())
+            self.sqlUserValues.append(self.passwordInput.get())
+            if self.sqlUserValues[0] == "":
                 raise WrongUsername
-            elif self.sqlValues[1] == "":
+            elif self.sqlUserValues[1] == "":
                 raise WrongPassword
-            self.myCursor.execute(self.newUser, self.sqlValues)
+            self.myCursor.execute(self.newUser, self.sqlUserValues)
             self.myDB.commit()
             self.setUpMain()
         except mysql.connector.errors.IntegrityError:
-            self.sqlValues.clear()
+            self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That username is already taken")
         except WrongUsername:
-            self.sqlValues.clear()
+            self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "Please enter a valid username")
         except WrongPassword:
-            self.sqlValues.clear()
+            self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "Please enter a valid password")
 
     def sqlLogin(self):
         try:
-            self.sqlValues.clear()
-            self.sqlValues.append(self.userNameInput.get())
-            self.myCursor.execute(self.userNameCheck, self.sqlValues)
+            self.sqlUserValues.clear()
+            self.sqlUserValues.append(self.userNameInput.get())
+            self.myCursor.execute(self.userNameCheck, self.sqlUserValues)
             self.sqlResult = self.myCursor.fetchall()
             if self.sqlResult == []:
                 raise WrongUsername
-            self.sqlValues.append(self.passwordInput.get())
-            self.myCursor.execute(self.passwordCheck, self.sqlValues)
+            self.sqlUserValues.append(self.passwordInput.get())
+            self.myCursor.execute(self.passwordCheck, self.sqlUserValues)
             self.sqlResult = self.myCursor.fetchall()
             if self.sqlResult == []:
                 raise WrongPassword
             self.setUpMain()
         except WrongUsername:
-            self.sqlValues.clear()
+            self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That username is incorrect")
         except WrongPassword:
-            self.sqlValues.clear()
+            self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That password is incorrect")
+    
+    def sqlNewTime(self, time, level):
+        self.sqlTimeValues.clear()
+        self.sqlTimeValues.append(time)
+        self.sqlTimeValues.append(level)
+        self.sqlTimeValues.append(self.sqlUserValues[0])
+        self.myCursor.execute(self.newTime, self.sqlTimeValues)
+        self.myDB.commit()
         
 
 
 class game():
     def __init__(self):
         pygame.init()
+        self.startTime = 0.0
+        self.endTime = 0.0
         pygame.key.set_repeat(500,25)
         self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
@@ -280,6 +320,7 @@ class game():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
+                    self.endTime = time()
                     break
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.move["y neg"] += 1
@@ -333,14 +374,18 @@ class game():
             elif self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
                 self.win = True
                 self.running = False
+                self.endTime = time()
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14]:
                self.win = True
                self.running = False
+               self.endTime = time()
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14]:
                 self.win = True
                 self.running = False
+                self.endTime = time()
 
     def run(self):
+        self.startTime = time()
         while self.running == True:
             self.process()
             self.update()
