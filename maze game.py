@@ -57,7 +57,7 @@ class launcher():
 
         #leaderboard widgets and variables
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-        self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Helvetica", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
+        self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Courier", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
         self.insertString = ""
 
         #signup/login widgets
@@ -142,7 +142,11 @@ class launcher():
         self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
         for i in range(0,len(self.sqlResult)):
             self.insertString = ""
-            self.leaderboardDisplay.insert("end", self.sqlResult[i][0])
+            self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
+            for j in range(0,(12-len(self.sqlResult[i][1]))):
+                self.insertString += " "
+            self.insertString += str(self.sqlResult[i][2])
+            self.insertString += "\n"
             self.leaderboardDisplay.insert("end", self.insertString)
         self.leaderboardDisplay.config(state = "disabled")
 
