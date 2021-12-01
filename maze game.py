@@ -55,8 +55,10 @@ class launcher():
         self.selectFour = tk.Button(self.mainFrame, text = "Level Four", command = self.levelFour, font = ("Helvetica", 12))
         self.selectFive = tk.Button(self.mainFrame, text = "Level Five", command = self.levelFive, font = ("Helvetica", 12))
 
-        #leaderboard widgets
+        #leaderboard widgets and variables
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Helvetica", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
+        self.insertString = ""
 
         #signup/login widgets
         self.signUpTitle = tk.Label(self.mainFrame, text = "New Account", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
@@ -88,6 +90,7 @@ class launcher():
         self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
         self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
         self.newTime = "INSERT INTO mazetimes (time, level, userName) VALUES (%s,%s,%s)"
+        self.getLeaderboard = "SELECT level, username, time FROM mazetimes ORDER BY level DESC, time ASC"
         self.sqlUserValues = []
         self.sqlTimeValues = []
         self.sqlResult = []
@@ -130,8 +133,18 @@ class launcher():
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.leaderboardTitle.grid(column = 9, row = 0)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
-        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.leaderboardDisplay.grid(column = 9, row = 1)
+        self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
+        self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
+        self.sqlGetLeaderboard()
+        self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
+        self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
+        self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+        for i in range(0,len(self.sqlResult)):
+            self.insertString = ""
+            self.leaderboardDisplay.insert("end", self.sqlResult[i][0])
+            self.leaderboardDisplay.insert("end", self.insertString)
+        self.leaderboardDisplay.config(state = "disabled")
 
     def setUpLogin(self):
         for widget in self.mainFrame.winfo_children():
@@ -276,6 +289,10 @@ class launcher():
         self.sqlTimeValues.append(self.sqlUserValues[0])
         self.myCursor.execute(self.newTime, self.sqlTimeValues)
         self.myDB.commit()
+
+    def sqlGetLeaderboard(self):
+        self.myCursor.execute(self.getLeaderboard)
+        self.sqlResult = self.myCursor.fetchall()
         
 
 
