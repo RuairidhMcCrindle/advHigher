@@ -1,6 +1,9 @@
 import tkinter as tk
 import pygame
 from pygame import Vector2 as vector
+import mysql.connector
+from tkinter import messagebox
+from time import time
 
 
 
@@ -27,7 +30,7 @@ class launcher():
         self.row = list(range(2))
         #sets up grids and frames for windows
         self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
-        self.mainFrame.columnconfigure(self.rowColumn, minsize = 40, weight = 1)
+        self.mainFrame.columnconfigure(9, weight = 1)
         self.mainFrame.rowconfigure(self.rowColumn, minsize = 35)
         self.mainFrame.pack(fill = "both", expand = True)
         self.window.title("McCrindle's Maze")
@@ -35,14 +38,14 @@ class launcher():
         #common widgets
         #ideally all buttons should be 375 pixels wide and 32 pixels high
         self.quitButton = tk.Button(self.mainFrame, text = "Exit Game", command = self.window.destroy, font = ("Helvetica", 12))
-        self.mainMenu = tk.Button(self.mainFrame, text = "Main Menu", command = self.setUpMain, font = ("Helvetica", 12))
+        self.mainMenu = tk.Button(self.mainFrame, text = "Return", command = self.setUpMain, font = ("Helvetica", 12))
 
         #main menu widgets
         self.mainTitle = tk.Label(self.mainFrame, text= "Welcome to McCrindle's Maze", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.levelSelect = tk.Button(self.mainFrame, text = "Select Level", command = self.setUpSelect, font = ("Helvetica", 12))
         self.leaderboard = tk.Button(self.mainFrame, text = "Open Leaderboard", command = self.setUpLeaderboard, font = ("Helvetica", 12))
         self.login = tk.Button(self.mainFrame, text = "Login", command = self.setUpLogin, font = ("Helvetica", 12))
-        self.signUp = tk.Button(self.mainFrame, text = "Sign Up", command = self.setUpSignUp, font = ("Helvetica", 12))
+        self.signUp = tk.Button(self.mainFrame, text = "New Account", command = self.setUpSignUp, font = ("Helvetica", 12))
 
         #level select widgets
         self.selectTitle = tk.Label(self.mainFrame, text = "Level Select", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
@@ -52,14 +55,52 @@ class launcher():
         self.selectFour = tk.Button(self.mainFrame, text = "Level Four", command = self.levelFour, font = ("Helvetica", 12))
         self.selectFive = tk.Button(self.mainFrame, text = "Level Five", command = self.levelFive, font = ("Helvetica", 12))
 
-        #leaderboard widgets
+        #leaderboard widgets and variables
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Courier", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
+        self.changeDisplay = tk.Button(self.mainFrame, text = "Fastest Times", command = self.setUpLeaderboardDisplay, font = ("Helvetica", 12))
+        self.insertString = ""
+
+        #signup/login widgets
+        self.signUpTitle = tk.Label(self.mainFrame, text = "New Account", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.loginTitle = tk.Label(self.mainFrame, text = "Login", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
+        self.userNameTitle = tk.Label(self.mainFrame, text = "Username", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
+        self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10))
+        self.passwordTitle = tk.Label(self.mainFrame, text = "Password", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
+        self.passwordInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10), show = "*")
+        self.signUpButton = tk.Button(self.mainFrame, text = "Create Account" , command = self.sqlSignUp, font = ("Helvetica", 12))
+        self.loginButton = tk.Button(self.mainFrame, text = "Login" , command = self.sqlLogin, font = ("Helvetica", 12))
         
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-        self.congratsTitle.pack(pady=(0,30))
+        self.congratsTitle.pack()
+        self.completedTime = tk.Label(self.congratsWindow, text = "among", fg = "white", bg = "#004ecc", font = ("Helvetica", 16))
+        self.completedTime.pack(pady=(0,5))
         self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
         self.congratsButton.pack()
+
+        #database stuff
+        self.myDB = mysql.connector.connect(
+            host = "localhost",
+            user = "ruairidh",
+            password ="password",
+            database = "mazeGame"
+        )
+        self.myCursor = self.myDB.cursor()
+        self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
+        self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
+        self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
+        self.newTime = "INSERT INTO mazetimes (time, level, userName) VALUES (%s,%s,%s)"
+        self.getFastTimes = "SELECT level, username, time FROM mazetimes ORDER BY level DESC, time ASC"
+        self.getFastUsers = "SELECT username, ROUND(AVG(time),2) FROM mazetimes GROUP BY username"
+        self.sqlUserValues = []
+        self.sqlTimeValues = []
+        self.sqlResult = []
+        self.time = 0.0
+
+
+
+
 
 
     def setUpMain(self):
@@ -68,36 +109,119 @@ class launcher():
         self.mainTitle.grid(column = 9, row = 0)
         self.levelSelect.grid(column = 9, row = 14, pady = 2, ipadx = 138)
         self.leaderboard.grid(column = 9, row = 15, pady = 2, ipadx = 114)
-        self.login.grid(column = 9, row = 16, pady = 2, ipadx = 322)
-        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 305)
+        self.login.grid(column = 9, row = 16, pady = 2, ipadx = 161)
+        self.signUp.grid(column = 9, row = 17, pady = 2, ipadx = 135)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
 
 
     def setUpSelect(self):
-        #note: checks must be done to ensure an account is logged in before opening level select menu. implement after login system is implemented
-        for widget in self.mainFrame.winfo_children():
-            widget.grid_forget()
-        self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
-        self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 291)
-        self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 291)
-        self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 290)
-        self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 288)
-        self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 290)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
-        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        try:
+            if self.sqlUserValues == []:
+                raise Exception
+            for widget in self.mainFrame.winfo_children():
+                widget.grid_forget()
+            self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
+            self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 145)
+            self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 145)
+            self.selectThree.grid(column = 9, row = 14, pady = 2, ipadx = 140)
+            self.selectFour.grid(column = 9, row = 15, pady = 2, ipadx = 144)
+            self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
+            self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
+            self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        except Exception:
+            messagebox.showerror(title = "Error", message = "Please login to an account before playing")
 
     def setUpLeaderboard(self):
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.leaderboardTitle.grid(column = 9, row = 0)
-        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
-        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.leaderboardDisplay.grid(column = 9, row = 1)
+        self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
+        self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
+        self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
+        self.setUpLeaderboardDisplay()
+        self.leaderboardDisplay.config(state = "disabled")
+        
+        
+
+    def setUpLeaderboardDisplay(self):
+        self.leaderboardDisplay.config(state = "normal")
+        self.leaderboardDisplay.delete("1.0", "end")
+        if self.changeDisplay["text"] == "Fastest Times":
+            self.sqlGetFastTimes()
+            self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
+            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
+            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+            #string manipulation so that everything aligns
+            for i in range(0,len(self.sqlResult)):
+                self.insertString = ""
+                self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
+                for j in range(0,(12-len(self.sqlResult[i][1]))):
+                    self.insertString += " "
+                self.insertString += str(self.sqlResult[i][2])
+                self.insertString += "\n"
+                self.leaderboardDisplay.insert("end", self.insertString)
+            self.changeDisplay.config(text = "Fastest Users")
+            self.changeDisplay.grid(column = 9, row = 2, ipadx = 132)
+            self.leaderboardDisplay.config(state = "disabled")
+        else:
+            self.leaderboardDisplay.delete("1.0", "end")
+            self.leaderboardDisplay.config(state = "normal")
+            self.sqlGetFastUsers()
+            self.leaderboardDisplay.insert("1.0", "User        Avg Time (seconds)\n")
+            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
+            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+            #insertion sort
+            for i in range(1, len(self.sqlResult)):
+                self.insert = self.sqlResult[i]
+                j = i
+                while self.insert[1] < self.sqlResult[j-1][1] and j > 0:
+                    self.sqlResult[j] = self.sqlResult[j-1]
+                    j -= 1
+                self.sqlResult[j] = self.insert
+            #string manipulation so everything aligns
+            for i in range(0,len(self.sqlResult)):
+                self.insertString = ""
+                self.insertString += self.sqlResult[i][0]
+                for j in range(0,(12-len(self.sqlResult[i][0]))):
+                    self.insertString += " "
+                self.insertString += str(self.sqlResult[i][1])
+                self.insertString += "\n"
+                self.leaderboardDisplay.insert("end", self.insertString)
+            self.changeDisplay.config(text = "Fastest Times")
+            self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
+            self.leaderboardDisplay.config(state = "disabled")
+
+
 
     def setUpLogin(self):
-        pass
+        for widget in self.mainFrame.winfo_children():
+            widget.grid_forget()
+        self.loginTitle.grid(column = 9, row = 0)
+        self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
+        self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
+        self.passwordTitle.grid(column = 9, row = 4, padx = (0,1000))
+        self.passwordInput.grid(column = 9, row = 5, padx = (0,948))
+        self.loginButton.grid(column= 9, row = 16, pady = 2, ipadx = 161)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
+        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.userNameInput.delete(0,"end")
+        self.passwordInput.delete(0,"end")
 
     def setUpSignUp(self):
-        pass
+        for widget in self.mainFrame.winfo_children():
+            widget.grid_forget()
+        self.signUpTitle.grid(column = 9, row = 0)
+        self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
+        self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
+        self.passwordTitle.grid(column = 9, row = 4, padx = (0,1000))
+        self.passwordInput.grid(column = 9, row = 5, padx = (0,948))
+        self.signUpButton.grid(column= 9, row = 16, pady = 2, ipadx = 126)
+        self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
+        self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+        self.userNameInput.delete(0,"end")
+        self.passwordInput.delete(0,"end")
+        
 
     def popUpWindow(self):
         pass
@@ -106,8 +230,9 @@ class launcher():
         self.firstLevel = levelOne()
         self.firstLevel.run()
         pygame.quit()
+        print(self.firstLevel.endTime - self.firstLevel.startTime)
         if self.firstLevel.win == True:
-            self.congrats()
+            self.congrats(1)
         
 
     def levelTwo(self):
@@ -115,38 +240,119 @@ class launcher():
         self.secondLevel.run()
         pygame.quit()
         if self.secondLevel.win == True:
-            self.congrats()
+            self.congrats(2)
 
     def levelThree(self):
         self.thirdLevel = levelThree()
         self.thirdLevel.run()
         pygame.quit()
         if self.thirdLevel.win == True:
-            self.congrats()
+            self.congrats(3)
 
     def levelFour(self):
         self.fourthLevel = levelFour()
         self.fourthLevel.run()
         pygame.quit()
         if self.fourthLevel.win == True:
-            self.congrats()
+            self.congrats(4)
     
     def levelFive(self):
         self.fifthLevel = levelFive()
         self.fifthLevel.run()
         pygame.quit()
         if self.fifthLevel.win == True:
-            self.congrats()
+            self.congrats(5)
 
-    def congrats(self):
+    def congrats(self, level):
+        if level  == 1:
+            self.time = round(self.firstLevel.endTime - self.firstLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 2:
+            self.time = round(self.secondLevel.endTime - self.secondLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 3:
+            self.time = round(self.thirdLevel.endTime - self.thirdLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 4:
+            self.time = round(self.fourthLevel.endTime - self.fourthLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
+        elif level == 5:
+            self.time = round(self.fifthLevel.endTime - self.fifthLevel.startTime,2)
+            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+            self.sqlNewTime(self.time, level)
         self.congratsWindow.deiconify()
+    
+    def sqlSignUp(self):
+        try:
+            #mysql checks not currently working, wait for that fix before implementing further errors
+            self.sqlUserValues.clear()
+            self.sqlUserValues.append(self.userNameInput.get())
+            self.sqlUserValues.append(self.passwordInput.get())
+            if self.sqlUserValues[0] == "":
+                raise WrongUsername
+            elif self.sqlUserValues[1] == "":
+                raise WrongPassword
+            self.myCursor.execute(self.newUser, self.sqlUserValues)
+            self.myDB.commit()
+            self.setUpMain()
+        except mysql.connector.errors.IntegrityError:
+            self.sqlUserValues.clear()
+            messagebox.showerror(title = "Error", message = "That username is already taken")
+        except WrongUsername:
+            self.sqlUserValues.clear()
+            messagebox.showerror(title = "Error", message = "Please enter a valid username")
+        except WrongPassword:
+            self.sqlUserValues.clear()
+            messagebox.showerror(title = "Error", message = "Please enter a valid password")
 
+    def sqlLogin(self):
+        try:
+            self.sqlUserValues.clear()
+            self.sqlUserValues.append(self.userNameInput.get())
+            self.myCursor.execute(self.userNameCheck, self.sqlUserValues)
+            self.sqlResult = self.myCursor.fetchall()
+            if self.sqlResult == []:
+                raise WrongUsername
+            self.sqlUserValues.append(self.passwordInput.get())
+            self.myCursor.execute(self.passwordCheck, self.sqlUserValues)
+            self.sqlResult = self.myCursor.fetchall()
+            if self.sqlResult == []:
+                raise WrongPassword
+            self.setUpMain()
+        except WrongUsername:
+            self.sqlUserValues.clear()
+            messagebox.showerror(title = "Error", message = "That username is incorrect")
+        except WrongPassword:
+            self.sqlUserValues.clear()
+            messagebox.showerror(title = "Error", message = "That password is incorrect")
+    
+    def sqlNewTime(self, time, level):
+        self.sqlTimeValues.clear()
+        self.sqlTimeValues.append(time)
+        self.sqlTimeValues.append(level)
+        self.sqlTimeValues.append(self.sqlUserValues[0])
+        self.myCursor.execute(self.newTime, self.sqlTimeValues)
+        self.myDB.commit()
+
+    def sqlGetFastTimes(self):
+        self.myCursor.execute(self.getFastTimes)
+        self.sqlResult = self.myCursor.fetchall()
+    
+    def sqlGetFastUsers(self):
+        self.myCursor.execute(self.getFastUsers)
+        self.sqlResult = self.myCursor.fetchall()
         
 
 
 class game():
     def __init__(self):
         pygame.init()
+        self.startTime = 0.0
+        self.endTime = 0.0
         pygame.key.set_repeat(500,25)
         self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
@@ -183,6 +389,7 @@ class game():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
+                    self.endTime = time()
                     break
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.move["y neg"] += 1
@@ -236,14 +443,18 @@ class game():
             elif self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
                 self.win = True
                 self.running = False
+                self.endTime = time()
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14]:
                self.win = True
                self.running = False
+               self.endTime = time()
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14]:
                 self.win = True
                 self.running = False
+                self.endTime = time()
 
     def run(self):
+        self.startTime = time()
         while self.running == True:
             self.process()
             self.update()
@@ -375,8 +586,11 @@ class levelFive(game):
         pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
 
-
-
+#error definitions for sql
+class WrongUsername(Exception):
+    pass
+class WrongPassword(Exception):
+    pass
 
 
 
