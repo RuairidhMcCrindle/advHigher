@@ -54,52 +54,12 @@ class launcher():
 
         #leaderboard widgets
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-
-        self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Courier", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
-        self.changeDisplay = tk.Button(self.mainFrame, text = "Fastest Times", command = self.setUpLeaderboardDisplay, font = ("Helvetica", 12))
-        self.insertString = ""
-
-        #signup/login widgets
-        self.signUpTitle = tk.Label(self.mainFrame, text = "New Account", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-        self.loginTitle = tk.Label(self.mainFrame, text = "Login", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
-        self.userNameTitle = tk.Label(self.mainFrame, text = "Username", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
-        self.userNameInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10))
-        self.passwordTitle = tk.Label(self.mainFrame, text = "Password", fg = "white", bg = "#004ecc", font = ("Helvetica", 12))
-        self.passwordInput = tk.Entry(self.mainFrame, font = ("Helvetica", 10), show = "*")
-        self.signUpButton = tk.Button(self.mainFrame, text = "Create Account" , command = self.sqlSignUp, font = ("Helvetica", 12))
-        self.loginButton = tk.Button(self.mainFrame, text = "Login" , command = self.sqlLogin, font = ("Helvetica", 12))
         
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.congratsTitle.pack(pady=(0,30))
         self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
         self.congratsButton.pack()
-
-
-        #database stuff
-        self.myDB = mysql.connector.connect(
-            host = "localhost",
-            user = "ruairidh",
-            password ="password",
-            database = "mazeGame"
-        )
-        self.myCursor = self.myDB.cursor()
-        self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
-        self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
-        self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
-        self.newTime = "INSERT INTO mazetimes (time, level, userName) VALUES (%s,%s,%s)"
-        self.getFastTimes = "SELECT level, username, time FROM mazetimes ORDER BY level DESC, time ASC"
-        self.getFastUsers = "SELECT username, ROUND(AVG(time),2) FROM mazetimes GROUP BY username"
-        self.sqlUserValues = []
-        self.sqlTimeValues = []
-        self.sqlResult = []
-        self.time = 0.0
-
-
-
-
-
-
 
 
     def setUpMain(self):
@@ -130,68 +90,8 @@ class launcher():
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
         self.leaderboardTitle.grid(column = 9, row = 0)
-
-        self.leaderboardDisplay.grid(column = 9, row = 1)
-        self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
-        self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
-        self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
-        self.setUpLeaderboardDisplay()
-        self.leaderboardDisplay.config(state = "disabled")
-        
-        
-
-    def setUpLeaderboardDisplay(self):
-        self.leaderboardDisplay.config(state = "normal")
-        self.leaderboardDisplay.delete("1.0", "end")
-        if self.changeDisplay["text"] == "Fastest Times":
-            self.sqlGetFastTimes()
-            self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
-            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
-            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
-            #string manipulation so that everything aligns
-            for i in range(0,len(self.sqlResult)):
-                self.insertString = ""
-                self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
-                for j in range(0,(12-len(self.sqlResult[i][1]))):
-                    self.insertString += " "
-                self.insertString += str(self.sqlResult[i][2])
-                self.insertString += "\n"
-                self.leaderboardDisplay.insert("end", self.insertString)
-            self.changeDisplay.config(text = "Fastest Users")
-            self.changeDisplay.grid(column = 9, row = 2, ipadx = 132)
-            self.leaderboardDisplay.config(state = "disabled")
-        else:
-            self.leaderboardDisplay.delete("1.0", "end")
-            self.leaderboardDisplay.config(state = "normal")
-            self.sqlGetFastUsers()
-            self.leaderboardDisplay.insert("1.0", "User        Avg Time (seconds)\n")
-            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
-            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
-            #insertion sort
-            for i in range(1, len(self.sqlResult)):
-                self.insert = self.sqlResult[i]
-                j = i
-                while self.insert[1] < self.sqlResult[j-1][1] and j > 0:
-                    self.sqlResult[j] = self.sqlResult[j-1]
-                    j -= 1
-                self.sqlResult[j] = self.insert
-            #string manipulation so everything aligns
-            for i in range(0,len(self.sqlResult)):
-                self.insertString = ""
-                self.insertString += self.sqlResult[i][0]
-                for j in range(0,(12-len(self.sqlResult[i][0]))):
-                    self.insertString += " "
-                self.insertString += str(self.sqlResult[i][1])
-                self.insertString += "\n"
-                self.leaderboardDisplay.insert("end", self.insertString)
-            self.changeDisplay.config(text = "Fastest Times")
-            self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
-            self.leaderboardDisplay.config(state = "disabled")
-
-
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 285)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
-
 
     def setUpLogin(self):
         pass
@@ -240,68 +140,6 @@ class launcher():
 
     def congrats(self):
         self.congratsWindow.deiconify()
-
-    
-    def sqlSignUp(self):
-        try:
-            #mysql checks not currently working, wait for that fix before implementing further errors
-            self.sqlUserValues.clear()
-            self.sqlUserValues.append(self.userNameInput.get())
-            self.sqlUserValues.append(self.passwordInput.get())
-            if self.sqlUserValues[0] == "":
-                raise WrongUsername
-            elif self.sqlUserValues[1] == "":
-                raise WrongPassword
-            self.myCursor.execute(self.newUser, self.sqlUserValues)
-            self.myDB.commit()
-            self.setUpMain()
-        except mysql.connector.errors.IntegrityError:
-            self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "That username is already taken")
-        except WrongUsername:
-            self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "Please enter a valid username")
-        except WrongPassword:
-            self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "Please enter a valid password")
-
-    def sqlLogin(self):
-        try:
-            self.sqlUserValues.clear()
-            self.sqlUserValues.append(self.userNameInput.get())
-            self.myCursor.execute(self.userNameCheck, self.sqlUserValues)
-            self.sqlResult = self.myCursor.fetchall()
-            if self.sqlResult == []:
-                raise WrongUsername
-            self.sqlUserValues.append(self.passwordInput.get())
-            self.myCursor.execute(self.passwordCheck, self.sqlUserValues)
-            self.sqlResult = self.myCursor.fetchall()
-            if self.sqlResult == []:
-                raise WrongPassword
-            self.setUpMain()
-        except WrongUsername:
-            self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "That username is incorrect")
-        except WrongPassword:
-            self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "That password is incorrect")
-    
-    def sqlNewTime(self, time, level):
-        self.sqlTimeValues.clear()
-        self.sqlTimeValues.append(time)
-        self.sqlTimeValues.append(level)
-        self.sqlTimeValues.append(self.sqlUserValues[0])
-        self.myCursor.execute(self.newTime, self.sqlTimeValues)
-        self.myDB.commit()
-
-    def sqlGetFastTimes(self):
-        self.myCursor.execute(self.getFastTimes)
-        self.sqlResult = self.myCursor.fetchall()
-    
-    def sqlGetFastUsers(self):
-        self.myCursor.execute(self.getFastUsers)
-        self.sqlResult = self.myCursor.fetchall()
-
 
         
 
