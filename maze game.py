@@ -58,6 +58,7 @@ class launcher():
         #leaderboard widgets and variables
         self.leaderboardTitle = tk.Label(self.mainFrame, text = "Leaderboard", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.leaderboardDisplay = tk.Text(self.mainFrame,  fg = "white", bg = "#004ecc", font = ("Courier", 14), wrap = "none", selectbackground = "#004ecc", highlightcolor = "#cc5200")
+        self.changeDisplay = tk.Button(self.mainFrame, text = "Fastest Times", command = self.setUpLeaderboardDisplay, font = ("Helvetica", 12))
         self.insertString = ""
 
         #signup/login widgets
@@ -90,7 +91,8 @@ class launcher():
         self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
         self.passwordCheck = "SELECT username, Users.password FROM Users WHERE username = %s AND Users.password = %s"
         self.newTime = "INSERT INTO mazetimes (time, level, userName) VALUES (%s,%s,%s)"
-        self.getLeaderboard = "SELECT level, username, time FROM mazetimes ORDER BY level DESC, time ASC"
+        self.getFastTimes = "SELECT level, username, time FROM mazetimes ORDER BY level DESC, time ASC"
+        self.getFastUsers = "SELECT username, ROUND(AVG(time),2) FROM mazetimes GROUP BY username"
         self.sqlUserValues = []
         self.sqlTimeValues = []
         self.sqlResult = []
@@ -134,21 +136,63 @@ class launcher():
             widget.grid_forget()
         self.leaderboardTitle.grid(column = 9, row = 0)
         self.leaderboardDisplay.grid(column = 9, row = 1)
+        self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
         self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
-        self.sqlGetLeaderboard()
-        self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
-        self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
-        self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
-        for i in range(0,len(self.sqlResult)):
-            self.insertString = ""
-            self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
-            for j in range(0,(12-len(self.sqlResult[i][1]))):
-                self.insertString += " "
-            self.insertString += str(self.sqlResult[i][2])
-            self.insertString += "\n"
-            self.leaderboardDisplay.insert("end", self.insertString)
+        self.setUpLeaderboardDisplay()
         self.leaderboardDisplay.config(state = "disabled")
+        
+        
+
+    def setUpLeaderboardDisplay(self):
+        self.leaderboardDisplay.config(state = "normal")
+        self.leaderboardDisplay.delete("1.0", "end")
+        if self.changeDisplay["text"] == "Fastest Times":
+            self.sqlGetFastTimes()
+            self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
+            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
+            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+            #string manipulation so that everything aligns
+            for i in range(0,len(self.sqlResult)):
+                self.insertString = ""
+                self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
+                for j in range(0,(12-len(self.sqlResult[i][1]))):
+                    self.insertString += " "
+                self.insertString += str(self.sqlResult[i][2])
+                self.insertString += "\n"
+                self.leaderboardDisplay.insert("end", self.insertString)
+            self.changeDisplay.config(text = "Fastest Users")
+            self.changeDisplay.grid(column = 9, row = 2, ipadx = 132)
+            self.leaderboardDisplay.config(state = "disabled")
+        else:
+            self.leaderboardDisplay.delete("1.0", "end")
+            self.leaderboardDisplay.config(state = "normal")
+            self.sqlGetFastUsers()
+            self.leaderboardDisplay.insert("1.0", "User        Avg Time (seconds)\n")
+            self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
+            self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+            #insertion sort
+            for i in range(1, len(self.sqlResult)):
+                self.insert = self.sqlResult[i]
+                j = i
+                while self.insert[1] < self.sqlResult[j-1][1] and j > 0:
+                    self.sqlResult[j] = self.sqlResult[j-1]
+                    j -= 1
+                self.sqlResult[j] = self.insert
+            #string manipulation so everything aligns
+            for i in range(0,len(self.sqlResult)):
+                self.insertString = ""
+                self.insertString += self.sqlResult[i][0]
+                for j in range(0,(12-len(self.sqlResult[i][0]))):
+                    self.insertString += " "
+                self.insertString += str(self.sqlResult[i][1])
+                self.insertString += "\n"
+                self.leaderboardDisplay.insert("end", self.insertString)
+            self.changeDisplay.config(text = "Fastest Times")
+            self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
+            self.leaderboardDisplay.config(state = "disabled")
+
+
 
     def setUpLogin(self):
         for widget in self.mainFrame.winfo_children():
@@ -294,8 +338,12 @@ class launcher():
         self.myCursor.execute(self.newTime, self.sqlTimeValues)
         self.myDB.commit()
 
-    def sqlGetLeaderboard(self):
-        self.myCursor.execute(self.getLeaderboard)
+    def sqlGetFastTimes(self):
+        self.myCursor.execute(self.getFastTimes)
+        self.sqlResult = self.myCursor.fetchall()
+    
+    def sqlGetFastUsers(self):
+        self.myCursor.execute(self.getFastUsers)
         self.sqlResult = self.myCursor.fetchall()
         
 
