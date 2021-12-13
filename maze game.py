@@ -15,7 +15,7 @@ class launcher():
         self.window = window
         self.congratsWindow = tk.Toplevel(window, bg = "#004ecc")
         self.congratsWindow.withdraw()
-        self.congratsWindow.protocol("WM_DELETE_WINDOW", self.congratsWindow.withdraw)
+        self.congratsWindow.protocol("WM_DELETE_WINDOW", self.congratsWindow.withdraw) #when close window button is pressed, hides window instead
 
         #sets window dimensions, and makes it so that the size cannot be changed
         self.window.geometry("1095x700")
@@ -27,7 +27,6 @@ class launcher():
 
         #makes lists from 0-(n-1) inclusive        
         self.rowColumn = list(range(19))
-        self.row = list(range(2))
         #sets up grids and frames for windows
         self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
         self.mainFrame.columnconfigure(9, weight = 1)
@@ -74,7 +73,7 @@ class launcher():
         #congrats window widget
         self.congratsTitle = tk.Label(self.congratsWindow, text= "Congratulations! You won!", fg = "white", bg = "#004ecc", font = ("Helvetica", 20))
         self.congratsTitle.pack()
-        self.completedTime = tk.Label(self.congratsWindow, text = "among", fg = "white", bg = "#004ecc", font = ("Helvetica", 16))
+        self.completedTime = tk.Label(self.congratsWindow, text = "", fg = "white", bg = "#004ecc", font = ("Helvetica", 16))
         self.completedTime.pack(pady=(0,5))
         self.congratsButton = tk.Button(self.congratsWindow, text = "OK", command = self.congratsWindow.withdraw, font = ("Helvetica", 12))
         self.congratsButton.pack()
@@ -165,8 +164,6 @@ class launcher():
             self.changeDisplay.grid(column = 9, row = 2, ipadx = 132)
             self.leaderboardDisplay.config(state = "disabled")
         else:
-            self.leaderboardDisplay.delete("1.0", "end")
-            self.leaderboardDisplay.config(state = "normal")
             self.sqlGetFastUsers()
             self.leaderboardDisplay.insert("1.0", "User        Avg Time (seconds)\n")
             self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
@@ -223,15 +220,13 @@ class launcher():
         self.passwordInput.delete(0,"end")
         
 
-    def popUpWindow(self):
-        pass
 
     def levelOne(self):
         self.firstLevel = levelOne()
         self.firstLevel.run()
         pygame.quit()
-        print(self.firstLevel.endTime - self.firstLevel.startTime)
         if self.firstLevel.win == True:
+            self.time = round(self.firstLevel.endTime - self.firstLevel.startTime,2)
             self.congrats(1)
         
 
@@ -240,6 +235,7 @@ class launcher():
         self.secondLevel.run()
         pygame.quit()
         if self.secondLevel.win == True:
+            self.time = round(self.secondLevel.endTime - self.secondLevel.startTime,2)
             self.congrats(2)
 
     def levelThree(self):
@@ -247,6 +243,7 @@ class launcher():
         self.thirdLevel.run()
         pygame.quit()
         if self.thirdLevel.win == True:
+            self.time = round(self.thirdLevel.endTime - self.thirdLevel.startTime,2)
             self.congrats(3)
 
     def levelFour(self):
@@ -254,6 +251,7 @@ class launcher():
         self.fourthLevel.run()
         pygame.quit()
         if self.fourthLevel.win == True:
+            self.time = round(self.fourthLevel.endTime - self.fourthLevel.startTime,2)
             self.congrats(4)
     
     def levelFive(self):
@@ -261,29 +259,12 @@ class launcher():
         self.fifthLevel.run()
         pygame.quit()
         if self.fifthLevel.win == True:
+            self.time = round(self.fifthLevel.endTime - self.fifthLevel.startTime,2)
             self.congrats(5)
 
-    def congrats(self, level):
-        if level  == 1:
-            self.time = round(self.firstLevel.endTime - self.firstLevel.startTime,2)
-            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-            self.sqlNewTime(self.time, level)
-        elif level == 2:
-            self.time = round(self.secondLevel.endTime - self.secondLevel.startTime,2)
-            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-            self.sqlNewTime(self.time, level)
-        elif level == 3:
-            self.time = round(self.thirdLevel.endTime - self.thirdLevel.startTime,2)
-            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-            self.sqlNewTime(self.time, level)
-        elif level == 4:
-            self.time = round(self.fourthLevel.endTime - self.fourthLevel.startTime,2)
-            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-            self.sqlNewTime(self.time, level)
-        elif level == 5:
-            self.time = round(self.fifthLevel.endTime - self.fifthLevel.startTime,2)
-            self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-            self.sqlNewTime(self.time, level)
+    def congrats(self, level): 
+        self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
+        self.sqlNewTime(self.time, level)
         self.congratsWindow.deiconify()
     
     def sqlSignUp(self):
@@ -372,8 +353,6 @@ class game():
             [], #ninth row
             []  #tenth row 
         ]
-        self.rowValues = [0,70,140,210,280,350,420,490,560,630] #the start y value for each row
-        self.columnValues = [0, 73, 146, 219, 292, 365, 438, 511, 584, 657, 730, 803, 876, 949, 1022] #the start x value for each column
         self.position = {"x": 0, "y":0}
         self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
         self.totalMove = {"x": 0,"y": 0}
@@ -453,6 +432,15 @@ class game():
                 self.running = False
                 self.endTime = time()
 
+    def render(self, colour):
+        self.window.fill((204,82,0))
+        for i in range(0,10):
+            for j in self.pathBlocks[i]:
+                pygame.draw.rect(self.window, colour, (j.x, j.y, 73, 70))
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+        pygame.display.update()
+
     def run(self):
         self.startTime = time()
         while self.running == True:
@@ -478,13 +466,7 @@ class levelOne(game):
             [vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
             [vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
-        self.window.fill((204,82,0))
-        for i in range(0,10):
-            for j in self.pathBlocks[i]:
-                pygame.draw.rect(self.window, (0,78,204), (j.x, j.y, 73, 70))
-        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
-        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
-        pygame.display.update()
+        super().render((0,78,204))
 
 class levelTwo(game):
     def __init__(self):
@@ -503,13 +485,7 @@ class levelTwo(game):
             [vector(self.columnValues[8], self.rowValues[8])], #ninth row
             [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
-        self.window.fill((204,82,0))
-        for i in range(0,10):
-            for j in self.pathBlocks[i]:
-                pygame.draw.rect(self.window, (51,78,153), (j.x, j.y, 73, 70))
-        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
-        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
-        pygame.display.update()
+        super().render((51,78,153))
 
 class levelThree(game):
     def __init__(self):
@@ -528,13 +504,7 @@ class levelThree(game):
             [vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8])], #ninth row
             [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
-        self.window.fill((204,82,0))
-        for i in range(0,10):
-            for j in self.pathBlocks[i]:
-                pygame.draw.rect(self.window, (102,78,102), (j.x, j.y, 73, 70))
-        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
-        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
-        pygame.display.update()
+        super().render((102,78,102))
 
 class levelFour(game):
     def __init__(self):
@@ -553,13 +523,7 @@ class levelFour(game):
             [vector(self.columnValues[5], self.rowValues[8]), vector(self.columnValues[6], self.rowValues[8]), vector(self.columnValues[7], self.rowValues[8]), vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[10], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[12], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
             [vector(self.columnValues[14], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
-        self.window.fill((204,82,0))
-        for i in range(0,10):
-            for j in self.pathBlocks[i]:
-                pygame.draw.rect(self.window, (153,78,51), (j.x, j.y, 73, 70))
-        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
-        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
-        pygame.display.update()
+        super().render((153,78,51))
 
 class levelFive(game):
     def __init__(self):
@@ -585,6 +549,7 @@ class levelFive(game):
         pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
         pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
         pygame.display.update()
+        super().render((204,78,0))
 
 #error definitions for sql
 class WrongUsername(Exception):
@@ -595,7 +560,6 @@ class WrongPassword(Exception):
 
 
 def main():
-    pygame.init()
     root = tk.Tk()
     menuWindow = launcher(root)
     menuWindow.setUpMain()
