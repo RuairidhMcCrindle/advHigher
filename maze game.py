@@ -264,7 +264,7 @@ class launcher():
 
     def congrats(self, level): 
         self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
-        self.sqlNewTime(self.time, level)
+        self.sqlNewTime(level)
         self.congratsWindow.deiconify()
     
     def sqlSignUp(self):
@@ -311,9 +311,9 @@ class launcher():
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That password is incorrect")
     
-    def sqlNewTime(self, time, level):
+    def sqlNewTime(self,level):
         self.sqlTimeValues.clear()
-        self.sqlTimeValues.append(time)
+        self.sqlTimeValues.append(self.time)
         self.sqlTimeValues.append(level)
         self.sqlTimeValues.append(self.sqlUserValues[0])
         self.myCursor.execute(self.newTime, self.sqlTimeValues)
@@ -340,7 +340,7 @@ class game():
         #each block in maze is 73 by 70
         #therefore each row is 15 blocks, and each column is 10 blocks
         self.rowValues = [0,70,140,210,280,350,420,490,560,630] #the start y value for each row
-        self.columnValues = [0, 73, 146, 219, 292, 365, 438, 511, 584, 657, 730, 803, 876, 949, 1022] #the start x value for each coumn
+        self.columnValues = [0, 73, 146, 219, 292, 365, 438, 511, 584, 657, 730, 803, 876, 949, 1022] #the start x value for each column
         self.pathBlocks = [
             [], #first row
             [], #second row
@@ -368,7 +368,6 @@ class game():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
-                    self.endTime = time()
                     break
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.move["y neg"] += 1
@@ -384,7 +383,7 @@ class game():
         self.totalMove["x"] = (((2)**(self.move["x pos"] - 10)) - ((2)**(self.move["x neg"] - 10)))
         self.totalMove["y"] = (((2)**(self.move["y pos"] - 10)) - ((2)**(self.move["y neg"] - 10)))
         if self.position["x"] + self.totalMove["x"] < 0 or self.position["x"] + self.totalMove["x"] > 1045 or self.position["y"] + self.totalMove["y"] < 0 or self.position["y"] + self.totalMove["y"] > 650:
-            self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 0,0,0,0
+            self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 10,10,10,10
             self.position["x"], self.position["y"] = 0,0
         else:
             self.positionCheck = [False, False, False, False]
@@ -406,7 +405,7 @@ class game():
                 self.position["x"] += self.totalMove["x"]
                 self.position["y"] += self.totalMove["y"]
             else:
-                self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 0,0,0,0
+                self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 10,10,10,10
                 self.position["x"], self.position["y"] = 0,0
 
             if self.totalMove["x"] == 0:
@@ -417,7 +416,8 @@ class game():
             
             if self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
                 self.win = True
-                self.running = False   
+                self.running = False  
+                self.endTime = time() 
 
             elif self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14] and self.position["y"] + self.totalMove["y"] <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] >= self.rowValues[9]:
                 self.win = True
