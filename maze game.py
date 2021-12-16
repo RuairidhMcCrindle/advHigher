@@ -1,6 +1,5 @@
 import tkinter as tk
 import pygame
-from pygame import Vector2 as vector
 import mysql.connector
 from tkinter import messagebox
 from time import time
@@ -543,6 +542,11 @@ class levelFive(game):
             [vector(self.columnValues[0], self.rowValues[9]), vector(self.columnValues[1], self.rowValues[9]), vector(self.columnValues[2], self.rowValues[9]), vector(self.columnValues[3], self.rowValues[9]), vector(self.columnValues[4], self.rowValues[9]), vector(self.columnValues[6], self.rowValues[9]), vector(self.columnValues[7], self.rowValues[9]), vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
         super().render((204,78,0))
+
+class vector():
+    def __init__(self, paramX, paramY):
+        self.x = paramX
+        self.y = paramY
 
 #error definitions for sql
 class WrongUsername(Exception):
