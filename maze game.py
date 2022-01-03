@@ -276,6 +276,8 @@ class launcher():
                 raise WrongUsername
             elif self.sqlUserValues[1] == "":
                 raise WrongPassword
+            elif len(self.sqlUserValues[0]) > 8:
+                raise WrongUsername 
             self.myCursor.execute(self.newUser, self.sqlUserValues)
             self.myDB.commit()
             self.setUpMain()
@@ -284,7 +286,7 @@ class launcher():
             messagebox.showerror(title = "Error", message = "That username is already taken")
         except WrongUsername:
             self.sqlUserValues.clear()
-            messagebox.showerror(title = "Error", message = "Please enter a valid username")
+            messagebox.showerror(title = "Error", message = "Username must be between 1 and 8 characters")
         except WrongPassword:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "Please enter a valid password")
