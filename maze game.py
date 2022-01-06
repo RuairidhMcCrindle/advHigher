@@ -276,6 +276,7 @@ class launcher():
                 raise WrongUsername
             elif self.sqlUserValues[1] == "":
                 raise WrongPassword
+            self.myCursor.execute(self.newUser, self.sqlUserValues)
             self.myDB.commit()
             self.setUpMain()
         except mysql.connector.errors.IntegrityError:
