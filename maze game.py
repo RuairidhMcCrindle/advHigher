@@ -221,44 +221,44 @@ class launcher():
 
 
     def levelOne(self):
-        self.firstLevel = levelOne()
-        self.firstLevel.run()
+        firstLevel = levelOne()
+        firstLevel.run()
         pygame.quit()
-        if self.firstLevel.win == True:
-            self.time = round(self.firstLevel.endTime - self.firstLevel.startTime,2)
+        if firstLevel.win == True:
+            self.time = round(firstLevel.endTime - firstLevel.startTime,2)
             self.congrats(1)
         
 
     def levelTwo(self):
-        self.secondLevel = levelTwo()
-        self.secondLevel.run()
+        secondLevel = levelTwo()
+        secondLevel.run()
         pygame.quit()
-        if self.secondLevel.win == True:
-            self.time = round(self.secondLevel.endTime - self.secondLevel.startTime,2)
+        if secondLevel.win == True:
+            self.time = round(secondLevel.endTime - secondLevel.startTime,2)
             self.congrats(2)
 
     def levelThree(self):
-        self.thirdLevel = levelThree()
-        self.thirdLevel.run()
+        thirdLevel = levelThree()
+        thirdLevel.run()
         pygame.quit()
-        if self.thirdLevel.win == True:
-            self.time = round(self.thirdLevel.endTime - self.thirdLevel.startTime,2)
+        if thirdLevel.win == True:
+            self.time = round(thirdLevel.endTime - thirdLevel.startTime,2)
             self.congrats(3)
 
     def levelFour(self):
-        self.fourthLevel = levelFour()
-        self.fourthLevel.run()
+        fourthLevel = levelFour()
+        fourthLevel.run()
         pygame.quit()
-        if self.fourthLevel.win == True:
-            self.time = round(self.fourthLevel.endTime - self.fourthLevel.startTime,2)
+        if fourthLevel.win == True:
+            self.time = round(fourthLevel.endTime - fourthLevel.startTime,2)
             self.congrats(4)
     
     def levelFive(self):
-        self.fifthLevel = levelFive()
-        self.fifthLevel.run()
+        fifthLevel = levelFive()
+        fifthLevel.run()
         pygame.quit()
-        if self.fifthLevel.win == True:
-            self.time = round(self.fifthLevel.endTime - self.fifthLevel.startTime,2)
+        if fifthLevel.win == True:
+            self.time = round(fifthLevel.endTime - fifthLevel.startTime,2)
             self.congrats(5)
 
     def congrats(self, level): 
