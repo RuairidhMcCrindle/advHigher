@@ -24,8 +24,9 @@ class launcher():
         self.congratsWindow.minsize(325,100)
         self.congratsWindow.maxsize(325,100)
 
-        #makes lists from 0-(n-1) inclusive        
+        #makes list from 0-(n-1) inclusive        
         self.rowColumn = list(range(19))
+
         #sets up grids and frames for windows
         self.mainFrame = tk.Frame(self.window, width = 1096, height = 701, bg = "#004ecc")
         self.mainFrame.columnconfigure(9, weight = 1)
@@ -84,6 +85,7 @@ class launcher():
             password ="password",
             database = "mazeGame"
         )
+
         self.myCursor = self.myDB.cursor()
         self.newUser = "INSERT INTO Users (username, password) VALUES (%s,%s)"
         self.userNameCheck = "SELECT username FROM Users WHERE username = %s"
@@ -102,8 +104,10 @@ class launcher():
 
 
     def setUpMain(self):
+        #loops through all widgets that have a place on the grid, and makes them forget it
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
+
         self.mainTitle.grid(column = 9, row = 0)
         self.levelSelect.grid(column = 9, row = 14, pady = 2, ipadx = 138)
         self.leaderboard.grid(column = 9, row = 15, pady = 2, ipadx = 114)
@@ -116,8 +120,10 @@ class launcher():
         try:
             if self.sqlUserValues == []:
                 raise Exception
+            #loops through all widgets that have a place on the grid, and makes them forget it
             for widget in self.mainFrame.winfo_children():
                 widget.grid_forget()
+
             self.selectTitle.grid(column = 9, row = 0, pady = 2, ipadx = 187)
             self.selectOne.grid(column = 9, row = 12, pady = 2, ipadx = 145)
             self.selectTwo.grid(column = 9, row = 13, pady = 2, ipadx = 145)
@@ -126,64 +132,87 @@ class launcher():
             self.selectFive.grid(column = 9, row = 16, pady = 2, ipadx = 145)
             self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
             self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+
         except Exception:
             messagebox.showerror(title = "Error", message = "Please login to an account before playing")
 
     def setUpLeaderboard(self):
+        #loops through all widgets that have a place on the grid, and makes them forget it
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
+        
         self.leaderboardTitle.grid(column = 9, row = 0)
         self.leaderboardDisplay.grid(column = 9, row = 1)
         self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
         self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
         self.setUpLeaderboardDisplay()
+        #prevents editing of display
         self.leaderboardDisplay.config(state = "disabled")
         
         
 
     def setUpLeaderboardDisplay(self):
+        #enables editing of display
         self.leaderboardDisplay.config(state = "normal")
+        #clears display
         self.leaderboardDisplay.delete("1.0", "end")
+
         if self.changeDisplay["text"] == "Fastest Times":
             self.sqlGetFastTimes()
+
+            #highlights first line
             self.leaderboardDisplay.insert("1.0", "Level    User        Time (seconds)\n")
             self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
             self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+
             #string manipulation so that everything aligns
             for i in range(0,len(self.sqlResult)):
                 self.insertString = ""
                 self.insertString += str(self.sqlResult[i][0]) + "        " + self.sqlResult[i][1]
+
                 for j in range(0,(12-len(self.sqlResult[i][1]))):
                     self.insertString += " "
+
                 self.insertString += str(self.sqlResult[i][2])
                 self.insertString += "\n"
                 self.leaderboardDisplay.insert("end", self.insertString)
+
             self.changeDisplay.config(text = "Fastest Users")
             self.changeDisplay.grid(column = 9, row = 2, ipadx = 132)
+            #disables editing of display
             self.leaderboardDisplay.config(state = "disabled")
+
         else:
             self.sqlGetFastUsers()
+
+            #highlights first line
             self.leaderboardDisplay.insert("1.0", "User        Avg Time (seconds)\n")
             self.leaderboardDisplay.tag_add("highlightline", "1.0", "2.0")
             self.leaderboardDisplay.tag_config("highlightline", background = "#cc5200", foreground = "black")
+
             #insertion sort
             for i in range(1, len(self.sqlResult)):
                 self.insert = self.sqlResult[i]
                 j = i
+
                 while self.insert[1] < self.sqlResult[j-1][1] and j > 0:
                     self.sqlResult[j] = self.sqlResult[j-1]
                     j -= 1
                 self.sqlResult[j] = self.insert
+
             #string manipulation so everything aligns
             for i in range(0,len(self.sqlResult)):
                 self.insertString = ""
                 self.insertString += self.sqlResult[i][0]
+
                 for j in range(0,(12-len(self.sqlResult[i][0]))):
                     self.insertString += " "
+
                 self.insertString += str(self.sqlResult[i][1])
                 self.insertString += "\n"
                 self.leaderboardDisplay.insert("end", self.insertString)
+
             self.changeDisplay.config(text = "Fastest Times")
             self.changeDisplay.grid(column = 9, row = 2, ipadx = 131)
             self.leaderboardDisplay.config(state = "disabled")
@@ -191,8 +220,10 @@ class launcher():
 
 
     def setUpLogin(self):
+        #loops through all widgets that have a place on the grid, and makes them forget it
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
+
         self.loginTitle.grid(column = 9, row = 0)
         self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
         self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
@@ -201,12 +232,16 @@ class launcher():
         self.loginButton.grid(column= 9, row = 16, pady = 2, ipadx = 161)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+
+        #clears input boxes
         self.userNameInput.delete(0,"end")
         self.passwordInput.delete(0,"end")
 
     def setUpSignUp(self):
+        #loops through all widgets that have a place on the grid, and makes them forget it
         for widget in self.mainFrame.winfo_children():
             widget.grid_forget()
+
         self.signUpTitle.grid(column = 9, row = 0)
         self.userNameTitle.grid(column = 9, row = 2, padx = (0,1000))
         self.userNameInput.grid(column = 9, row = 3, padx = (0,948))
@@ -215,6 +250,8 @@ class launcher():
         self.signUpButton.grid(column= 9, row = 16, pady = 2, ipadx = 126)
         self.mainMenu.grid(column = 9, row = 17, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 18, pady = 2, ipadx = 144)
+
+        #clears input boxes
         self.userNameInput.delete(0,"end")
         self.passwordInput.delete(0,"end")
         
@@ -224,6 +261,7 @@ class launcher():
         firstLevel = levelOne()
         firstLevel.run()
         pygame.quit()
+
         if firstLevel.win == True:
             self.time = round(firstLevel.endTime - firstLevel.startTime,2)
             self.congrats(1)
@@ -233,6 +271,7 @@ class launcher():
         secondLevel = levelTwo()
         secondLevel.run()
         pygame.quit()
+
         if secondLevel.win == True:
             self.time = round(secondLevel.endTime - secondLevel.startTime,2)
             self.congrats(2)
@@ -241,6 +280,7 @@ class launcher():
         thirdLevel = levelThree()
         thirdLevel.run()
         pygame.quit()
+
         if thirdLevel.win == True:
             self.time = round(thirdLevel.endTime - thirdLevel.startTime,2)
             self.congrats(3)
@@ -249,6 +289,7 @@ class launcher():
         fourthLevel = levelFour()
         fourthLevel.run()
         pygame.quit()
+
         if fourthLevel.win == True:
             self.time = round(fourthLevel.endTime - fourthLevel.startTime,2)
             self.congrats(4)
@@ -257,6 +298,7 @@ class launcher():
         fifthLevel = levelFive()
         fifthLevel.run()
         pygame.quit()
+
         if fifthLevel.win == True:
             self.time = round(fifthLevel.endTime - fifthLevel.startTime,2)
             self.congrats(5)
@@ -264,27 +306,34 @@ class launcher():
     def congrats(self, level): 
         self.completedTime.config(text = "You completed the maze in %ss" % (self.time))
         self.sqlNewTime(level)
+
+        #hides window
         self.congratsWindow.deiconify()
     
     def sqlSignUp(self):
         try:
-            #mysql checks not currently working, wait for that fix before implementing further errors
             self.sqlUserValues.clear()
             self.sqlUserValues.append(self.userNameInput.get())
             self.sqlUserValues.append(self.passwordInput.get())
+
             if self.sqlUserValues[0] == "" or len(self.sqlUserValues[0]) > 8:
                 raise WrongUsername
+                
             elif self.sqlUserValues[1] == "":
                 raise WrongPassword
+
             self.myCursor.execute(self.newUser, self.sqlUserValues)
             self.myDB.commit()
             self.setUpMain()
+
         except mysql.connector.errors.IntegrityError:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That username is already taken")
+
         except WrongUsername:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "Username must be between 1 and 8 characters")
+
         except WrongPassword:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "Please enter a valid password")
@@ -295,17 +344,23 @@ class launcher():
             self.sqlUserValues.append(self.userNameInput.get())
             self.myCursor.execute(self.userNameCheck, self.sqlUserValues)
             self.sqlResult = self.myCursor.fetchall()
+
             if self.sqlResult == []:
                 raise WrongUsername
+
             self.sqlUserValues.append(self.passwordInput.get())
             self.myCursor.execute(self.passwordCheck, self.sqlUserValues)
             self.sqlResult = self.myCursor.fetchall()
+
             if self.sqlResult == []:
                 raise WrongPassword
+
             self.setUpMain()
+
         except WrongUsername:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That username is incorrect")
+
         except WrongPassword:
             self.sqlUserValues.clear()
             messagebox.showerror(title = "Error", message = "That password is incorrect")
@@ -352,15 +407,18 @@ class game():
             [], #ninth row
             []  #tenth row 
         ]
-        self.position = {"x": 0, "y":0}
+        self.position = {"x": 0, "y":0} #current x,y position of the top left corner of the player character
         self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
         self.totalMove = {"x": 0,"y": 0}
         self.positionCheck = [False, False, False, False] #top left, top right, bottom right, bottom left. checks for whether any of the players corners are in a path block
         self.win = False
         self.running = True
+
     def process(self):
         self.eventList = pygame.event.get()
+
         for event in self.eventList:
+
             if event.type == pygame.QUIT:
                 self.running = False   
                 break
@@ -368,12 +426,16 @@ class game():
                 if event.key == pygame.K_ESCAPE:
                     self.running = False
                     break
+
                 elif event.key == pygame.K_UP or event.key == pygame.K_w:
                     self.move["y neg"] += 1
+
                 elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                     self.move["y pos"] += 1
+
                 elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     self.move["x pos"] += 1
+                    
                 elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     self.move["x neg"] += 1
                 
@@ -381,11 +443,14 @@ class game():
     def update(self):
         self.totalMove["x"] = (((2)**(self.move["x pos"] - 10)) - ((2)**(self.move["x neg"] - 10)))
         self.totalMove["y"] = (((2)**(self.move["y pos"] - 10)) - ((2)**(self.move["y neg"] - 10)))
+
         if self.position["x"] + self.totalMove["x"] < 0 or self.position["x"] + self.totalMove["x"] > 1045 or self.position["y"] + self.totalMove["y"] < 0 or self.position["y"] + self.totalMove["y"] > 650:
             self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 10,10,10,10
             self.position["x"], self.position["y"] = 0,0
+
         else:
             self.positionCheck = [False, False, False, False]
+
             for i in range(0,10):
                 for j in self.pathBlocks[i]:
                     if self.position["x"] + self.totalMove["x"] <= j.x + 73 and self.position["x"] + self.totalMove["x"] >= j.x and self.position["y"] + self.totalMove["y"] <= j.y + 70 and self.position["y"] + self.totalMove["y"] >= j.y:
@@ -422,10 +487,12 @@ class game():
                 self.win = True
                 self.running = False
                 self.endTime = time()
+
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] + 50 <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] + 50 >= self.columnValues[14]:
                self.win = True
                self.running = False
                self.endTime = time()
+               
             elif self.position["y"] + self.totalMove["y"] + 50 <= self.rowValues[9] + 70 and self.position["y"] + self.totalMove["y"] + 50 >= self.rowValues[9] and self.position["x"] + self.totalMove["x"] <= self.columnValues[14] + 73 and self.position["x"] + self.totalMove["x"] >= self.columnValues[14]:
                 self.win = True
                 self.running = False
