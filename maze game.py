@@ -120,6 +120,7 @@ class launcher():
         try:
             if self.sqlUserValues == []:
                 raise Exception
+
             #loops through all widgets that have a place on the grid, and makes them forget it
             for widget in self.mainFrame.winfo_children():
                 widget.grid_forget()
@@ -147,6 +148,7 @@ class launcher():
         self.mainMenu.grid(column = 9, row = 3, pady = 2, ipadx = 158)
         self.quitButton.grid(column = 9, row = 4, pady = 2, ipadx = 144)
         self.setUpLeaderboardDisplay()
+
         #prevents editing of display
         self.leaderboardDisplay.config(state = "disabled")
         
@@ -155,6 +157,7 @@ class launcher():
     def setUpLeaderboardDisplay(self):
         #enables editing of display
         self.leaderboardDisplay.config(state = "normal")
+
         #clears display
         self.leaderboardDisplay.delete("1.0", "end")
 
@@ -391,6 +394,7 @@ class game():
         pygame.key.set_repeat(500,25)
         self.window = pygame.display.set_mode((1095, 700))
         self.clockRate = pygame.time.Clock()
+
         #each block in maze is 73 by 70
         #therefore each row is 15 blocks, and each column is 10 blocks
         self.rowValues = [0,70,140,210,280,350,420,490,560,630] #the start y value for each row
@@ -407,6 +411,7 @@ class game():
             [], #ninth row
             []  #tenth row 
         ]
+
         self.position = {"x": 0, "y":0} #current x,y position of the top left corner of the player character
         self.move = {"x pos": 10, "x neg": 10,"y pos": 10,"y neg": 10} #where the first index is positive x movement, second is negative x, third is positive y, fourth is negative y
         self.totalMove = {"x": 0,"y": 0}
@@ -468,6 +473,7 @@ class game():
             if self.positionCheck[0] == True and self.positionCheck[1] == True and self.positionCheck[2] == True and self.positionCheck[3] == True:
                 self.position["x"] += self.totalMove["x"]
                 self.position["y"] += self.totalMove["y"]
+
             else:
                 self.move["x pos"], self.move["x neg"], self.move["y pos"], self.move["y neg"] = 10,10,10,10
                 self.position["x"], self.position["y"] = 0,0
@@ -499,16 +505,22 @@ class game():
                 self.endTime = time()
 
     def render(self, colour):
-        self.window.fill((204,82,0))
+        self.window.fill((204,82,0)) #background colour is set
+
+        #path blocks are drawn
         for i in range(0,10):
             for j in self.pathBlocks[i]:
                 pygame.draw.rect(self.window, colour, (j.x, j.y, 73, 70))
-        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70))
-        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50))
+
+
+        pygame.draw.rect(self.window, (57,255,20), (self.columnValues[14], self.rowValues[9], 73, 70)) #ending block is drawn
+        pygame.draw.rect(self.window, (0,0,0),(self.position["x"], self.position["y"], 50,50)) #player character is drawn
         pygame.display.update()
 
     def run(self):
         self.startTime = time()
+        
+        #game loop patern
         while self.running == True:
             self.process()
             self.update()
@@ -520,6 +532,8 @@ class levelOne(game):
         super().__init__()
         pygame.display.set_caption("Level One")
     def render(self):
+
+        #coordinates for path blocks are set
         self.pathBlocks = [
             [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0])], #first row
             [vector(self.columnValues[2], self.rowValues[1])], #second row
@@ -532,6 +546,7 @@ class levelOne(game):
             [vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
             [vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
+
         super().render((0,78,204))
 
 class levelTwo(game):
@@ -539,6 +554,7 @@ class levelTwo(game):
         super().__init__()
         pygame.display.set_caption("Level Two")
     def render(self):
+        #coordinates for path blocks are set
         self.pathBlocks = [
             [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[6], self.rowValues[0]), vector(self.columnValues[7], self.rowValues[0]), vector(self.columnValues[8], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0]), vector(self.columnValues[10], self.rowValues[0]), vector(self.columnValues[11], self.rowValues[0]), vector(self.columnValues[12], self.rowValues[0]), vector(self.columnValues[13], self.rowValues[0]), vector(self.columnValues[14], self.rowValues[0])], #first row
             [vector(self.columnValues[14], self.rowValues[1])], #second row
@@ -551,6 +567,7 @@ class levelTwo(game):
             [vector(self.columnValues[8], self.rowValues[8])], #ninth row
             [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
+
         super().render((51,78,153))
 
 class levelThree(game):
@@ -558,6 +575,7 @@ class levelThree(game):
         super().__init__()
         pygame.display.set_caption("Level Three")
     def render(self):
+        #coordinates for path blocks are set
         self.pathBlocks = [
             [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[1], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[7], self.rowValues[0]), vector(self.columnValues[8], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0])], #first row
             [vector(self.columnValues[1], self.rowValues[1]), vector(self.columnValues[3], self.rowValues[1]), vector(self.columnValues[5], self.rowValues[1]), vector(self.columnValues[7], self.rowValues[1]), vector(self.columnValues[9], self.rowValues[1])], #second row
@@ -570,6 +588,7 @@ class levelThree(game):
             [vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[13], self.rowValues[8])], #ninth row
             [vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[10], self.rowValues[9]), vector(self.columnValues[11], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
+
         super().render((102,78,102))
 
 class levelFour(game):
@@ -577,6 +596,7 @@ class levelFour(game):
         super().__init__()
         pygame.display.set_caption("Level Four")
     def render(self):
+        #coordinates for path blocks are set
         self.pathBlocks = [
             [vector(self.columnValues[0], self.rowValues[0])], #first row
             [vector(self.columnValues[0], self.rowValues[1]), vector(self.columnValues[1], self.rowValues[1]), vector(self.columnValues[2], self.rowValues[1])], #second row
@@ -589,6 +609,7 @@ class levelFour(game):
             [vector(self.columnValues[5], self.rowValues[8]), vector(self.columnValues[6], self.rowValues[8]), vector(self.columnValues[7], self.rowValues[8]), vector(self.columnValues[8], self.rowValues[8]), vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[10], self.rowValues[8]), vector(self.columnValues[11], self.rowValues[8]), vector(self.columnValues[12], self.rowValues[8]), vector(self.columnValues[14], self.rowValues[8])], #ninth row
             [vector(self.columnValues[14], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
+
         super().render((153,78,51))
 
 class levelFive(game):
@@ -596,6 +617,7 @@ class levelFive(game):
         super().__init__()
         pygame.display.set_caption("Level Five")
     def render(self):
+        #coordinates for path blocks are set
         self.pathBlocks = [
             [vector(self.columnValues[0], self.rowValues[0]), vector(self.columnValues[2], self.rowValues[0]), vector(self.columnValues[3], self.rowValues[0]), vector(self.columnValues[4], self.rowValues[0]), vector(self.columnValues[5], self.rowValues[0]), vector(self.columnValues[9], self.rowValues[0]), vector(self.columnValues[10], self.rowValues[0]), vector(self.columnValues[11], self.rowValues[0]), vector(self.columnValues[12], self.rowValues[0])], #first row
             [vector(self.columnValues[0], self.rowValues[1]), vector(self.columnValues[2], self.rowValues[1]), vector(self.columnValues[5], self.rowValues[1]), vector(self.columnValues[9], self.rowValues[1]), vector(self.columnValues[12], self.rowValues[1])], #second row
@@ -608,6 +630,7 @@ class levelFive(game):
             [vector(self.columnValues[0], self.rowValues[8]), vector(self.columnValues[4], self.rowValues[8]), vector(self.columnValues[6], self.rowValues[8]), vector(self.columnValues[9], self.rowValues[8]), vector(self.columnValues[12], self.rowValues[8])], #ninth row
             [vector(self.columnValues[0], self.rowValues[9]), vector(self.columnValues[1], self.rowValues[9]), vector(self.columnValues[2], self.rowValues[9]), vector(self.columnValues[3], self.rowValues[9]), vector(self.columnValues[4], self.rowValues[9]), vector(self.columnValues[6], self.rowValues[9]), vector(self.columnValues[7], self.rowValues[9]), vector(self.columnValues[8], self.rowValues[9]), vector(self.columnValues[9], self.rowValues[9]), vector(self.columnValues[12], self.rowValues[9]), vector(self.columnValues[13], self.rowValues[9]), vector(self.columnValues[14], self.rowValues[9])]  #tenth row 
         ]
+
         super().render((204,78,0))
 
 class vector():
